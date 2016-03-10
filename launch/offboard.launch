@@ -1,0 +1,43 @@
+<launch>
+ 
+	<arg name="fcu_url" default="/dev/ttyAMA0:57600" />
+        <arg name="gcs_url" default="udp://:14556@192.168.0.116:14550" />
+        <!--arg name="gcs_url" default="" /-->
+        <arg name="tgt_system" default="1" />
+        <arg name="tgt_component" default="1" />
+        <arg name="log_output" default="screen" />
+
+ 
+<node name="mavros" pkg="mavros" type="mavros_node" output="screen">
+    <param name="fcu_url" value="$(arg fcu_url)" />
+    <param name="gcs_url" value="$(arg gcs_url)" />
+    <param name="target_system_id" value="$(arg tgt_system)" />
+    <param name="target_component_id" value="$(arg tgt_component)" />
+ 
+    <!--rosparam command="load" file="$(find mavros)/launch/px4_blacklist.yaml"-->
+ 
+    <!-- enable heartbeat send and reduce timeout -->
+    <param name="conn_heartbeat" value="5.0" />
+    <param name="conn_timeout" value="5.0" />
+    <!-- automatically start mavlink on USB -->
+    <param name="startup_px4_usb_quirk" value="true" />
+    <param name="mocap/use_tf" value="false"/>
+    <param name="mocap/use_pose" value="true"/>
+</node>
+ 
+<!--node name="setpoint_pub" pkg="inrol_ros" type="pub_setpoints_pos" output="screen"-->
+ 
+<!--/node-->
+ 
+<node pkg="mocap_optitrack"
+      type="mocap_node"
+      name="mocap_node"
+      respawn="false"
+      launch-prefix=""
+      required="true">
+      <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
+    <remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/>           
+</node>
+ 
+ 
+</launch>
