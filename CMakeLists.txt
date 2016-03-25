@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(offboard)
+project(offboard2)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -99,7 +99,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES offboard
+#  LIBRARIES offboard2
 #  CATKIN_DEPENDS geometry_msgs
 #  DEPENDS system_lib
 )
@@ -116,24 +116,24 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(offboard
-#   src/${PROJECT_NAME}/offboard.cpp
+# add_library(offboard2
+#   src/${PROJECT_NAME}/offboard2.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(offboard ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(offboard2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(offboard_node src/offboard_node.cpp)
+# add_executable(offboard2_node src/offboard2_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(offboard_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(offboard2_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(offboard_node
+# target_link_libraries(offboard2_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -152,7 +152,7 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS offboard offboard_node
+# install(TARGETS offboard2 offboard2_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -177,7 +177,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_offboard.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_offboard2.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
