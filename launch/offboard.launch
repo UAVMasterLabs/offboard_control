@@ -36,8 +36,10 @@
       launch-prefix=""
       required="true">
       <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
-    <remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/>           
+      <remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/>           
 </node>
- 
+
+<node pkg="offboard" type="vel_set.py" name="offboard_node">
+</node>
  
 </launch>
