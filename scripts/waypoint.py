@@ -5,8 +5,8 @@ from numpy import *
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from tf.transformations import euler_from_quaternion as efq
 
-def transform(pose):
-	pose = pose.pose
+def transform(PoseStamped):
+	pose = PoseStamped.pose
 	pos = pose.position
 	orient = pose.orientation
 	# Simple rotations from ENU to NED... ish
@@ -20,7 +20,12 @@ def transform(pose):
 	# yet. should come from a subscription to a topic somehow. Still learning...
 	des_pos = array([0,0,-1.5])
 	pos_err = tfpos-des_pos
-	vel_set(pos_err)
+	
+	# Keep yaw turned towards +x
+	des_yaw = 0
+	yaw_err = tforient[0] - des_yaw
+
+	vel_set(pos_err,yaw_err)
 
 def vel_set(err):
 	pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel',TwistStamped,queue_size=10)
@@ -31,6 +36,7 @@ def vel_set(err):
 	vel.twist.linear.x = x
 	vel.twist.linear.y = y
 	vel.twist.linear.z = z
+	vel.twist.angular.z = yaw_err
 	pub.publish(vel)
 
 def position():
