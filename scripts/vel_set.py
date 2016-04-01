@@ -10,7 +10,7 @@ def vel_set():
     while not rospy.is_shutdown():
         vel = TwistStamped()
         vel.header.stamp = rospy.Time.now()
-        vel.twist.linear.x=0
+        vel.twist.linear.x=0.5
         vel.twist.linear.y=0
         vel.twist.linear.z=0
         pub.publish(vel)
