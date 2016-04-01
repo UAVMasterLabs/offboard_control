@@ -39,7 +39,7 @@
       <remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/>           
 </node>
 
-<node pkg="offboard" type="vel_set.py" name="offboard_node">
+<node pkg="offboard" type="waypoint.py" name="offboard_node">
 </node>
  
 </launch>
