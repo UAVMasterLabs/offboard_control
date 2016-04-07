@@ -1,6 +1,6 @@
 <launch>
  
-	<arg name="fcu_url" default="/dev/ttyAMA0:57600" />
+	<arg name="fcu_url" default="/dev/ttyAMA0:921600" />
         <arg name="gcs_url" default="udp://:14556@192.168.0.116:14550" />
         <!--arg name="gcs_url" default="" /-->
         <arg name="tgt_system" default="1" />
@@ -39,7 +39,7 @@
       <remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/>           
 </node>
 
-<node pkg="offboard" type="vel_set.py" name="offboard_node">
+<node pkg="offboard" type="waypoint.py" name="offboard_node">
 </node>
  
 </launch>

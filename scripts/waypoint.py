@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division
 import rospy
-from numpy import *
+from numpy import array, pi, abs
 from geometry_msgs.msg import PoseStamped, TwistStamped
 from tf.transformations import euler_from_quaternion as efq
 
