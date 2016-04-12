@@ -31,14 +31,14 @@ def vel_set(pos_err,yaw_err):
 	pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel',TwistStamped,queue_size=10)
 	vel = TwistStamped()
 	vel.header.stamp = rospy.Time.now()
-	err = [i if abs(i)<=0.5 else i/(abs(i)*2) for i in pos_err]
-	x,y,z = err
+#	pos_err = [i if abs(i)<=0.5 else i/(abs(i)*2) for i in pos_err]
+	x,y,z = pos_err
 	vel.twist.linear.x = x
 	vel.twist.linear.y = y
 	vel.twist.linear.z = z
-	yaw_err = yaw_err if abs(yaw_err)<=0.5 else yaw_err/abs(yaw_err*2)
+#	yaw_err = yaw_err if abs(yaw_err)<=0.5 else yaw_err/abs(yaw_err*2)
 	vel.twist.angular.z = yaw_err
-	print err,yaw_err
+#	print pos_err,yaw_err
 	pub.publish(vel)
 
 def position():

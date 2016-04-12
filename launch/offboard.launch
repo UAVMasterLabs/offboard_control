@@ -7,23 +7,17 @@
         <arg name="tgt_component" default="1" />
         <arg name="log_output" default="screen" />
 
- 
-<node name="mavros" pkg="mavros" type="mavros_node" output="screen">
-    <param name="fcu_url" value="$(arg fcu_url)" />
-    <param name="gcs_url" value="$(arg gcs_url)" />
-    <param name="target_system_id" value="$(arg tgt_system)" />
-    <param name="target_component_id" value="$(arg tgt_component)" />
- 
-    <!--rosparam command="load" file="$(find mavros)/launch/px4_blacklist.yaml"-->
- 
-    <!-- enable heartbeat send and reduce timeout -->
-    <param name="conn_heartbeat" value="5.0" />
-    <param name="conn_timeout" value="5.0" />
-    <!-- automatically start mavlink on USB -->
-    <param name="startup_px4_usb_quirk" value="true" />
-    <param name="mocap/use_tf" value="false"/>
-    <param name="mocap/use_pose" value="true"/>
-</node>
+	<include file="/home/pi/tunnel_ws/src/offboard/launch/node.launch">
+		<arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+		<arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+
+		<arg name="fcu_url" value="$(arg fcu_url)" />
+		<arg name="gcs_url" value="$(arg gcs_url)" />
+		<arg name="tgt_system" value="$(arg tgt_system)" />
+		<arg name="tgt_component" value="$(arg tgt_component)" />
+		<arg name="log_output" value="$(arg log_output)" />
+	</include>
+
  
 <!--node name="setpoint_pub" pkg="inrol_ros" type="pub_setpoints_pos" output="screen"-->
  
@@ -36,10 +30,10 @@
       launch-prefix=""
       required="true">
       <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
-      <remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/>           
+      <!--remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/-->           
 </node>
 
-<node pkg="offboard" type="waypoint.py" name="offboard_node">
-</node>
+<!--node pkg="offboard" type="mocap_node_custom.py" name="offboard_node"-->
+<!--/node-->
  
 </launch>
