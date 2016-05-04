@@ -3,10 +3,11 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import Pose2D
 
-global Time
+global Time, UAVPose
+UAVPose = PoseStamped()
 
 def set_pose(pose):
-	global Time
+	global Time, UAVPose
 	if rospy.Time.now() - Time < rospy.Duration(0.05):
 		return
 	#print 'publishing mocap'
@@ -20,10 +21,11 @@ def set_pose(pose):
 
 	
 
-def mocap_sub():
+def subscribers():
 	global Time
-	rospy.init_node('mocap_pose_getter')
-	Time = rospy.Time.now()
+	rospy.init_node('UAV_pose')
+#	Time = rospy.Time.now()
+	rospy.Subscriber('/Test_Quad_1/pose',PoseStamped,set_pose)
 	rospy.Subscriber('/Test_Quad_1/pose',PoseStamped,set_pose)
 	rospy.spin()
 

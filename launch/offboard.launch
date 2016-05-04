@@ -29,13 +29,14 @@
       launch-prefix=""
       required="true">
       <rosparam file="$(find mocap_optitrack)/config/mocap.yaml" command="load" />
-      <remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/>
+      <!--remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/-->
 </node>
 
-<!--node pkg="offboard" type="mocap_node_custom.py" name="mocap_node_custom"-->
-<!--/node-->
-
-<node pkg="offboard" type="pos_set.py" name="pos_set">
+<node pkg="offboard" type="pos_set.py" name="mocap_node_custom">
 </node>
- 
+
+<node pkg="offboard" type="slam_pose_set.py" name="UAV_pose">
+<!--node pkg="offboard" type="pos_set.py" name="UAV_pose"-->
+</node>
+
 </launch>

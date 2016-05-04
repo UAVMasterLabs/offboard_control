@@ -15,8 +15,8 @@ def pos_set():
         pos.header.stamp = rospy.Time.now()
         pos.pose.position.x=0
         pos.pose.position.y=0
-        pos.pose.position.z=1.5
-        quat = qfe(0,0,pi/2)
+        pos.pose.position.z=0.5
+        quat = qfe(0,0,0)
         pos.pose.orientation.w = quat[3]
         pos.pose.orientation.x = quat[0]
         pos.pose.orientation.y = quat[1]
