@@ -1,4 +1,6 @@
 <launch>
+
+	<!--###launch mavros node. Actual node is in file ".../offboard/launch.node.launch"###-->
 	<arg name="fcu_url" default="/dev/ttyAMA0:921600" />
         <arg name="gcs_url" default="udp://:14556@192.168.0.116:14550" />
         <!--arg name="gcs_url" default="" /-->
@@ -17,11 +19,8 @@
 		<arg name="log_output" value="$(arg log_output)" />
 	</include>
 
- 
-<!--node name="setpoint_pub" pkg="inrol_ros" type="pub_setpoints_pos" output="screen"-->
- 
-<!--/node-->
- 
+  
+<!--###launch mocap node. This will not be needed once there is SLAM data###-->
 <node pkg="mocap_optitrack"
       type="mocap_node"
       name="mocap_node"
@@ -32,11 +31,13 @@
       <!--remap from="/Test_Quad_1/pose" to="/mavros/mocap/pose"/-->
 </node>
 
-<node pkg="offboard" type="pos_set.py" name="mocap_node_custom">
-</node>
+<!--###launch offboard scripts. These are the things we have written.###-->
+<node pkg="offboard" type="pos_set.py" name="UAV_setpoint"/>
 
-<node pkg="offboard" type="slam_pose_set.py" name="UAV_pose">
-<!--node pkg="offboard" type="pos_set.py" name="UAV_pose"-->
-</node>
+<node pkg="offboard" type="vid_record.py" name="UAV_cam"/>
+
+<node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
+
+<!--node pkg="offboard" type="talker.py" name="UAV_path_planner"/-->
 
 </launch>

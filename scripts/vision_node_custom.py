@@ -26,7 +26,6 @@ def subscribers():
 	rospy.init_node('UAV_pose')
 #	Time = rospy.Time.now()
 	rospy.Subscriber('/Test_Quad_1/pose',PoseStamped,set_pose)
-	rospy.Subscriber('/Test_Quad_1/pose',PoseStamped,set_pose)
 	rospy.spin()
 
 def mocap_pub(pose):

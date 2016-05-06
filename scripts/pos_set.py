@@ -7,7 +7,7 @@ from numpy import pi
 
 def pos_set():
     pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
-    rospy.init_node('pos_set_node')
+    rospy.init_node('UAV_setpoint')
     rate = rospy.Rate(20)
     frame_id = 1
     while not rospy.is_shutdown():
@@ -15,7 +15,7 @@ def pos_set():
         pos.header.stamp = rospy.Time.now()
         pos.pose.position.x=0
         pos.pose.position.y=0
-        pos.pose.position.z=0.5
+        pos.pose.position.z=1.5
         quat = qfe(0,0,0)
         pos.pose.orientation.w = quat[3]
         pos.pose.orientation.x = quat[0]
