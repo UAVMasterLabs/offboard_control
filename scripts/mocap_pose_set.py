@@ -24,8 +24,8 @@ def set_alt(range):
 	
 def nodes():
 	rospy.init_node('UAV_pose')
-#	rospy.Subscriber('/Test_Quad_1/pose',PoseStamped,set_pose)
-	rospy.Subscriber('/slam_out_pose',PoseStamped,set_pose)
+	rospy.Subscriber('/Test_Quad_1/pose',PoseStamped,set_pose)
+#	rospy.Subscriber('/slam_out_pose',PoseStamped,set_pose)
 #	rospy.Subscriber('/poseupdate',PoseWithCovarianceStamped,set_pose)
 	rospy.Subscriber('/mavros/px4flow/ground_distance',Range,set_alt)
 	pub = rospy.Publisher('/mavros/mocap/pose',PoseStamped,queue_size=10)

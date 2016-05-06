@@ -53,25 +53,44 @@
 
         <param name="advertise_map_service" value="true"/>
         <!--<param name="tf_map_scanmatch_transform_frame_name" value="scanmatcher_frame" />-->
+
 </node>
+
+<arg name="geotiff_map_file_path" default="$(find hector_geotiff)/maps"/>
+
+<include file="$(find hector_geotiff)/launch/geotiff_mapper.launch">
+	<arg name="trajectory_source_frame_name" value="scanmatcher_frame"/>
+	<arg name="map_file_path" value="$(arg geotiff_map_file_path)"/>
+</include>
+
+
+
+
+<node name="hokuyo" pkg="hokuyo_node" type="hokuyo_node" respawn="false" output="screen">
+  
+	<!-- Starts up faster, but timestamps will be inaccurate. --> 
+	<param name="calibrate_time" type="bool" value="true"/> 
+    
+	<!-- Set the port to connect to here -->
+	<param name="port" type="string" value="/dev/ttyACM0"/> 
+  
+	<param name="intensity" type="bool" value="false"/>
+</node>
+  
+
 
 <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0 0 0 0 /base_link /laser 100"/>
 
 <!--###launch offboard scripts. These are the things we have written.###-->
-<node pkg="offboard" type="pos_set.py" name="UAV_setpoint">
-</node>
+<node pkg="offboard" type="pos_set.py" name="UAV_setpoint"/>
 
-<node pkg="offboard" type="vid_record.py" name="UAV_cam">
-</node>
+<node pkg="offboard" type="vid_record.py" name="UAV_cam"/>
 
-<node pkg="offboard" type="slam_pose_set.py" name="UAV_pose">
-</node>
+<node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
 
-<node pkg="offboard" type="talker.py" name="UAV_path_planner">
-</node>
+<node pkg="offboard" type="talker.py" name="UAV_path_planner"/>
 
 <!--###start SENTEL's navigation java engine for path planning###-->
-<node pkg="offboard" type="start_nav_engine.sh" name="nav_engine">
-</node>
+<node pkg="offboard" type="start_nav_engine.sh" name="nav_engine"/>
 
 </launch>

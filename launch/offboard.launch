@@ -36,7 +36,7 @@
 
 <node pkg="offboard" type="vid_record.py" name="UAV_cam"/>
 
-<node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
+<node pkg="offboard" type="mocap_pose_set.py" name="UAV_pose"/>
 
 <!--node pkg="offboard" type="talker.py" name="UAV_path_planner"/-->
 
