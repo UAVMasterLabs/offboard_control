@@ -9,7 +9,7 @@ import os
 from nav_msgs.msg import OccupancyGrid
 from std_msgs.msg import Int8MultiArray
 from std_msgs.msg import String
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import PoseArray
 
 def callback(OccupancyGrid):
 	'''This function is called everytime new map data is published
@@ -51,7 +51,7 @@ def talker(size):
 	mapdata = Int8MultiArray()	
 	rospy.init_node('talker', anonymous=True)
 	pub = rospy.Publisher('mapprob', Int8MultiArray, queue_size=10)
-	pubway = rospy.Publisher('next_wp', Point, queue_size=10)
+	pubway = rospy.Publisher('next_wps', PoseArray, queue_size=10)
 	rospy.Subscriber("nav_map", OccupancyGrid, callback)
 
 
@@ -76,17 +76,24 @@ def talker(size):
 #while we still have moves and have not returned to home base navigate
 #around
 	while p is not None:
+#		for pp in p:
+#			#jva.awt.point uses floats so we cast back to integers here
+#			way = Point()
+#			x = int(pp.getX())
+#			y = int(pp.getY())
+#			way.x = x
+#			way.y = y
+#			n = explorer.getNode(x,y)
+#			while not rospy.is_shutdown():
+#				pubway.publish(way)
+		#x_path,y_path = zip(*[(pp.getX(),pp,getY()) for pp in p])
+		ways = PoseArray()
+		i = 0
 		for pp in p:
-			#jva.awt.point uses floats so we cast back to integers here
-			way = Point()
-			x = int(pp.getX())
-			y = int(pp.getY())
-			way.x = x
-			way.y = y
-			n = explorer.getNode(x,y)
-			while not rospy.is_shutdown():
-				pubway.publish(way)
-
+			ways[i].poses.position.x = int(pp.getX())
+			ways[i].poses.position.y = int(pp.getY())
+			i += 1
+		pubway.publish(ways)
 		if last:
 			break
 
