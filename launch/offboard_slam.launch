@@ -34,8 +34,8 @@
 
         <!--Map size/start point-->
         <param name="map_resolution" value="0.05"/>
-        <param name="map_size" value="128"/>
-        <param name="map_start_x" value="0"/>
+        <param name="map_size" value="2048"/>
+        <param name="map_start_x" value="0.5"/>
         <param name="map_start_y" value="0.5"/>
         <param name="map_pub_period" value="5.0"/>
         <param name="laser_min_dist" value="0.02" />

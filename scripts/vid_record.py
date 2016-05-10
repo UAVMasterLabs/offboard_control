@@ -29,6 +29,7 @@ def record():
 	geotiff_pub = rospy.Publisher('syscommand',String,queue_size=10)
 	with picamera.PiCamera() as cam:
 		cam.resolution = (640,480)
+		cam.rotation = 180
 		while not rospy.is_shutdown():
 			now = ctime().replace(' ','_').replace(':','-')
 			if Record:
