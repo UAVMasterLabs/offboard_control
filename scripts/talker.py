@@ -11,15 +11,10 @@ from std_msgs.msg import Int8MultiArray
 from std_msgs.msg import String
 from geometry_msgs.msg import Point
 
-#global mapdata
-#global way
-#global flag
-
 def callback(OccupancyGrid):
 	'''This function is called everytime new map data is published
 	to the /map topic. Here we pass the dataon to be processed as
 	a tunnel for path finding'''
-#	global mapdata
 	mapdata = OccupancyGrid
 	genTunnel(mapdata)
 
@@ -32,7 +27,6 @@ def genTunnel(mapdata):
 	if we notice data is getting corrupted or the state of explorer
 	is unclear'''
 	global explorer
-#	print mapdata.data
 	size = mapdata.info.width
 	for ind in range (0,size*size):
 		y0 = divmod(ind,size)
@@ -53,30 +47,18 @@ def talker(size):
 	to genTunnel (via callback()). explorer is updated in the process and we
 	can then call the navigation engine functions on it. A path is returned
 	and the next waypoint is published on the /next_wp topic'''
-#	global flag
-#	global mapdata
 	global explorer
 	mapdata = Int8MultiArray()	
 	rospy.init_node('talker', anonymous=True)
 	pub = rospy.Publisher('mapprob', Int8MultiArray, queue_size=10)
 	pubway = rospy.Publisher('next_wp', Point, queue_size=10)
-	rospy.Subscriber("map", OccupancyGrid, callback)
+	rospy.Subscriber("nav_map", OccupancyGrid, callback)
 
 
-# What was this for? It seems that this is just sleeping for 0.1 seconds
-	'''if flag == 0:
-		rate = rospy.Rate(0.1)
-		rate.sleep()
-		flag = 1
-	else:
-		flag = 1'''
 # So maybe just do it this way if needed. It seems that you think that
 # talker() gets called many times, but it is only called once.
-	time.sleep(10)
+	time.sleep(0.1)
 
-# This should be done everytime we get new mapdata, no? I put it in the
-# callback function.
-#	genTunnel(mapdata,size)
 
 #shortest distance to consider and maximum range to use for navigation
 #these work for a 30 x 30 but for a larger obstacle map may need to be
@@ -96,13 +78,11 @@ def talker(size):
 	while p is not None:
 		for pp in p:
 			#jva.awt.point uses floats so we cast back to integers here
-#			global way
 			way = Point()
 			x = int(pp.getX())
 			y = int(pp.getY())
 			way.x = x
 			way.y = y
-#			print way
 			n = explorer.getNode(x,y)
 			while not rospy.is_shutdown():
 				pubway.publish(way)
@@ -117,8 +97,6 @@ def talker(size):
 
 		p = explorer.findClosestFrontier(way.x,way.y,maxrange,shortestdistance)
 
-#		rospy.Subscriber("map", OccupancyGrid, callback)
-#		genTunnel()
 		print p
 #get path back home if no frontier was found to explore
 
