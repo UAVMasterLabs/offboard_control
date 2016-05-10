@@ -2,8 +2,8 @@
 
 	<!--###launch mavros node. Actual node is in file ".../offboard/launch.node.launch"###-->
 	<arg name="fcu_url" default="/dev/ttyAMA0:921600" />
-        <arg name="gcs_url" default="udp://:14556@192.168.0.116:14550" />
-        <!--arg name="gcs_url" default="" /-->
+        <!--arg name="gcs_url" default="udp://:14556@192.168.0.116:14550" /-->
+        <arg name="gcs_url" default="" />
         <arg name="tgt_system" default="1" />
         <arg name="tgt_component" default="1" />
         <arg name="log_output" default="screen" />
@@ -33,9 +33,9 @@
         <param name="output_timing" value="false"/>
 
         <!--Map size/start point-->
-        <param name="map_resolution" value="0.1"/>
-        <param name="map_size" value="64"/>
-        <param name="map_start_x" value="0"/>
+        <param name="map_resolution" value="0.05"/>
+        <param name="map_size" value="2048"/>
+        <param name="map_start_x" value="0.5"/>
         <param name="map_start_y" value="0.5"/>
         <param name="map_pub_period" value="5.0"/>
         <param name="laser_min_dist" value="0.02" />
@@ -68,7 +68,7 @@
 
 <node name="hokuyo" pkg="hokuyo_node" type="hokuyo_node" respawn="false" output="screen">
   
-	<!-- Starts up faster, but timestamps will be inaccurate. --> 
+	<!-- Starts up slower, but timestamps will be accurate. --> 
 	<param name="calibrate_time" type="bool" value="true"/> 
     
 	<!-- Set the port to connect to here -->
@@ -88,9 +88,12 @@
 
 <node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
 
-<node pkg="offboard" type="talker.py" name="UAV_path_planner"/>
+<!--node pkg="offboard" type="talker.py" name="UAV_path_planner"/-->
 
 <!--###start SENTEL's navigation java engine for path planning###-->
-<node pkg="offboard" type="start_nav_engine.sh" name="nav_engine"/>
+<!--node pkg="offboard" type="start_nav_engine.sh" name="nav_engine"/-->
+
+<!--node pkg="rosbag" type="record" name="rosbag_record"
+	args="-o /media/tunnel_usb/flight -a"/-->
 
 </launch>

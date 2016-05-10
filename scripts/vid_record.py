@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from mavros_msgs.msg import State
+from std_msgs.msg import String
 
 import picamera
 from time import ctime
@@ -25,8 +26,10 @@ def arm_watch():
 
 def record():
 	global Record
+	geotiff_pub = rospy.Publisher('syscommand',String,queue_size=10)
 	with picamera.PiCamera() as cam:
 		cam.resolution = (640,480)
+		cam.rotation = 180
 		while not rospy.is_shutdown():
 			now = ctime().replace(' ','_').replace(':','-')
 			if Record:
@@ -35,6 +38,7 @@ def record():
 				while Record:
 					cam.wait_recording(1)
 				cam.stop_recording()
+				geotiff_pub.publish('savegeotiff')
 				rospy.loginfo('Vid recording stopped')
 
 if __name__ == '__main__':
