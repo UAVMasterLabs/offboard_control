@@ -9,7 +9,7 @@ import os
 from nav_msgs.msg import OccupancyGrid
 from std_msgs.msg import Int8MultiArray
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseArray
+from geometry_msgs.msg import PoseArray, Pose
 
 def callback(OccupancyGrid):
 	'''This function is called everytime new map data is published
