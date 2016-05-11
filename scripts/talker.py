@@ -88,11 +88,11 @@ def talker(size):
 #				pubway.publish(way)
 		#x_path,y_path = zip(*[(pp.getX(),pp,getY()) for pp in p])
 		ways = PoseArray()
-		i = 0
 		for pp in p:
-			ways[i].poses.position.x = int(pp.getX())
-			ways[i].poses.position.y = int(pp.getY())
-			i += 1
+			way = Pose()
+			way.position.x = int(pp.getX())
+			way.position.y = int(pp.getY())
+			ways.poses.append(way)
 		pubway.publish(ways)
 		if last:
 			break
@@ -102,14 +102,14 @@ def talker(size):
 #may also mean that max range wasn't high enough or shortest distance to
 #consider was too long
 
-		p = explorer.findClosestFrontier(way.x,way.y,maxrange,shortestdistance)
+		p = explorer.findClosestFrontier(way.position.x,way.position.y,maxrange,shortestdistance)
 
 		print p
 #get path back home if no frontier was found to explore
 
 		if p is None and not last:
 			last = True
-			p = explorer.findPath(way.x,way.y,size-1,0,shortestdistance)
+			p = explorer.findPath(way.position.x,way.position.y,size-1,0,shortestdistance)
 
 if __name__ == '__main__':
 	global explorer
