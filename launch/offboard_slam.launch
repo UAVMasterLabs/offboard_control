@@ -88,10 +88,10 @@
 
 <node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
 
-<!--node pkg="offboard" type="talker.py" name="UAV_path_planner"/-->
+<node pkg="offboard" type="talker.py" name="UAV_path_planner"/>
 
 <!--###start SENTEL's navigation java engine for path planning###-->
-<!--node pkg="offboard" type="start_nav_engine.sh" name="nav_engine"/-->
+<node pkg="offboard" type="start_nav_engine.sh" name="nav_engine"/>
 
 <!--node pkg="rosbag" type="record" name="rosbag_record"
 	args="-o /media/tunnel_usb/flight -a"/-->

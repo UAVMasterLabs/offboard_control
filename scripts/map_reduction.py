@@ -1,10 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This temporary script file is located here:
-/home/nick/.spyder2/.temp.py
-"""
+#!/usr/bin/env python
 from numpy import array, empty
 import rospy
 from sensor_msgs.msg import PointCloud

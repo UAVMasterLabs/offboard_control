@@ -19,11 +19,12 @@
 	        <param name="mocap/use_tf" value="false"/>
  	        <param name="mocap/use_pose" value="true"/>
 		<!--param name="distance_sensor/hrlv_ez4_sonar/subscriber" value="true" /-->
-		<param name="distance_sensor/lidarlite_laser/id" value="2" />
-		<param name="distance_sensor/lidarlite_laser/sensor_position" value="{x:0.0,y:0.0,x:0.0}" />
-		<param name="distance_sensor/lidarlite_laser/orientation" value="ROLL_180" />
-		<param name="distance_sensor/lidarlite_laser/field_of_view" value="0.0" />
-		<param name="distance_sensor/lidarlite_laser/frame_id" value="lidarlite_laser" />
+		<param name="distance_sensor/lidarlite_pub/id" value="1" />
+		<param name="distance_sensor/lidarlite_pub/sensor_position" value="{x:0.0,y:0.0,x:0.0}" />
+		<param name="distance_sensor/lidarlite_pub/orientation" value="ROLL_180" />
+		<param name="distance_sensor/lidarlite_pub/field_of_view" value="0.0" />
+		<param name="distance_sensor/lidarlite_pub/frame_id" value="lidarlite_laser" />
+		<param name="distance_sensor/lidarlite_pub/send_tf" value="true" />
 
 
 		<!-- load blacklist, config -->

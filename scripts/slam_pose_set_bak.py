@@ -28,9 +28,8 @@ def nodes():
 	rospy.Subscriber('/slam_out_pose',PoseStamped,set_pose)
 #	rospy.Subscriber('/poseupdate',PoseWithCovarianceStamped,set_pose)
 	rospy.Subscriber('/mavros/px4flow/ground_distance',Range,set_alt)
-#	rospy.Subscriber('/mavros/distance_sensor/hrlv_ez4_pub',Range,set_alt)
-#	pub = rospy.Publisher('/mavros/mocap/pose',PoseStamped,queue_size=10)
-	pub = rospy.Publisher('/mavros/vision_pose/pose',PoseStamped,queue_size=10)
+	pub = rospy.Publisher('/mavros/mocap/pose',PoseStamped,queue_size=10)
+#	pub = rospy.Publisher('/mavros/vision_pose/pose',PoseStamped,queue_size=10)
 #	pub = rospy.Publisher('/mavros/vision_pose/pose_cov',PoseWithCovarianceStamped,queue_size=10)
 	rate = rospy.Rate(15)
 	while not rospy.is_shutdown():
