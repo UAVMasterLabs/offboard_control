@@ -19,8 +19,8 @@ def set_pose(pose):
 
 def set_alt(range):
 	global UAVPose
-	UAVPose.pose.position.z = range.range
-#	UAVPose.pose.pose.position.z = range.range
+#	UAVPose.pose.position.z = range.range
+	UAVPose.pose.pose.position.z = range.range
 	
 def nodes():
 	rospy.init_node('UAV_pose')

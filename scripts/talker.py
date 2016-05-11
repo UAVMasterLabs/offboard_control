@@ -57,7 +57,7 @@ def talker(size):
 
 # So maybe just do it this way if needed. It seems that you think that
 # talker() gets called many times, but it is only called once.
-	time.sleep(0.1)
+	time.sleep(10)
 
 
 #shortest distance to consider and maximum range to use for navigation
@@ -69,8 +69,8 @@ def talker(size):
 	maxrange = 40
 
 #get first move
-	p = explorer.findClosestFrontier(size/2,0,maxrange,shortestdistance)
-	print '----------------------checkpoint--------------------'
+	p = explorer.findClosestFrontier(size/2,size/2,maxrange,shortestdistance)
+#	print '----------------------checkpoint--------------------'
 	last = False
 
 #while we still have moves and have not returned to home base navigate
@@ -93,6 +93,7 @@ def talker(size):
 			way.position.x = int(pp.getX())
 			way.position.y = int(pp.getY())
 			ways.poses.append(way)
+		print(len(ways.poses))
 		pubway.publish(ways)
 		if last:
 			break
@@ -104,12 +105,12 @@ def talker(size):
 
 		p = explorer.findClosestFrontier(way.position.x,way.position.y,maxrange,shortestdistance)
 
-		print p
+#		print p
 #get path back home if no frontier was found to explore
 
 		if p is None and not last:
 			last = True
-			p = explorer.findPath(way.position.x,way.position.y,size-1,0,shortestdistance)
+			p = explorer.findPath(way.position.x,way.position.y,size,0,shortestdistance)
 
 if __name__ == '__main__':
 	global explorer

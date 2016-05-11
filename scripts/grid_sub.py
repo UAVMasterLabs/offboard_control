@@ -1,4 +1,4 @@
-#!/usr/bin.env python
+#!/usr/bin/env python
 import rospy
 from nav_msgs.msg import OccupancyGrid
 from nav_msgs.msg import MapMetaData

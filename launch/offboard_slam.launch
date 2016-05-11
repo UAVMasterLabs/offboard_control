@@ -34,7 +34,7 @@
 
         <!--Map size/start point-->
         <param name="map_resolution" value="0.05"/>
-        <param name="map_size" value="2048"/>
+        <param name="map_size" value="1024"/>
         <param name="map_start_x" value="0.5"/>
         <param name="map_start_y" value="0.5"/>
         <param name="map_pub_period" value="5.0"/>
@@ -82,13 +82,19 @@
 <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0 0 0 0 /base_link /laser 100"/>
 
 <!--###launch offboard scripts. These are the things we have written.###-->
-<node pkg="offboard" type="pos_set.py" name="UAV_setpoint"/>
+<!--node pkg="offboard" type="pos_set.py" name="UAV_setpoint"/-->
 
 <node pkg="offboard" type="vid_record.py" name="UAV_cam"/>
 
 <node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
 
-<node pkg="offboard" type="talker.py" name="UAV_path_planner"/>
+<node pkg="offboard" type="talker.py" name="UAV_nav"/>
+
+<node pkg="offboard" type="traj_set.py" name="UAV_path_planner"/>
+
+<node pkg="offboard" type="map_reduction.py" name="UAV_nav_map"/>
+
+<node pkg="offboard" type="grid_sub.py" name="UAV_grid_loc"/>
 
 <!--###start SENTEL's navigation java engine for path planning###-->
 <node pkg="offboard" type="start_nav_engine.sh" name="nav_engine"/>
