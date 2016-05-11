@@ -9,7 +9,7 @@ import os
 from nav_msgs.msg import OccupancyGrid
 from std_msgs.msg import Int8MultiArray
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseArray
+from geometry_msgs.msg import PoseArray, Pose
 
 def callback(OccupancyGrid):
 	'''This function is called everytime new map data is published
@@ -40,10 +40,6 @@ def genTunnel(mapdata):
 			else:
 				explorer.addNode(y,x,True,False)
 
-def get_curr_grid(data):
-	global grid_loc
-	grid_loc = data
-
 
 def talker(size):
 	'''This is the main function of the whole script. Here we set up all of
@@ -57,8 +53,6 @@ def talker(size):
 	pub = rospy.Publisher('mapprob', Int8MultiArray, queue_size=10)
 	pubway = rospy.Publisher('next_wps', PoseArray, queue_size=10)
 	rospy.Subscriber("nav_map", OccupancyGrid, callback)
-	rospy.Subscriber("gridout", Pose, get_curr_grid) #get current grid location (needs cast to int)
-	rospy.Subscriber("map_metadata", MapMetaData, callback) #get res, orig, etc
 
 
 # So maybe just do it this way if needed. It seems that you think that
