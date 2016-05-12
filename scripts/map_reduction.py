@@ -17,6 +17,7 @@ def occ_grid_cb(data):
     nav_map.info = data.info
     nav_map.info.width = 64
     nav_map.info.height = 64
+    print(p.shape)
     nav_map.data = p[int(x)-32:int(x)+32,int(y)-32:int(y)+32].flatten()
     nav_map_pub.publish(nav_map)
 

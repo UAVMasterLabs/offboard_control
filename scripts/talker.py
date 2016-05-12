@@ -3,15 +3,17 @@
 
 import rospy
 from py4j.java_gateway import JavaGateway, Py4JNetworkError
+from py4j.java_collections import SetConverter, MapConverter, ListConverter
 import sys
 import time
 import os
 from nav_msgs.msg import OccupancyGrid
 from std_msgs.msg import Int8MultiArray
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseArray, Pose
+from geometry_msgs.msg import Pose
+from offboard.msg import Waypoints
 
-def callback(OccupancyGrid):
+def occ_grid_cb(OccupancyGrid):
 	'''This function is called everytime new map data is published
 	to the /map topic. Here we pass the dataon to be processed as
 	a tunnel for path finding'''
@@ -26,9 +28,11 @@ def genTunnel(mapdata):
 	and path plan in another subscription service. We will do this
 	if we notice data is getting corrupted or the state of explorer
 	is unclear'''
-	global explorer
+	global explorer,ways,pubway
+	print('I have the nav_map')
 	size = mapdata.info.width
-	for ind in range (0,size*size):
+	data = mapdata.data
+	'''for ind in range (0,size*size):
 		y0 = divmod(ind,size)
 		x = y0[1]
 		y = y0[0]
@@ -38,7 +42,23 @@ def genTunnel(mapdata):
 			if mapdata.data[ind]==100:
 				explorer.addNode(y,x,True,True)
 			else:
-				explorer.addNode(y,x,True,False)
+				explorer.addNode(y,x,True,False)'''
+	explorer.initializeArray(size)
+	explorer.importHectorList(ListConverter().convert(data,gateway._gateway_client),1)
+	shortestdistance = 3
+	maxrange = 40
+
+	#get first move
+	p = explorer.findClosestFrontier(size/2,size/2,maxrange,shortestdistance)
+	ways = Waypoints()
+	x_ways, y_ways = [], []
+	for pp in p:
+		x_ways.append(int(pp.getX()))
+		y_ways.append(int(pp.getY()))
+	ways.x = x_ways
+	ways.y = y_ways
+	pubway.publish(ways)
+
 
 
 def talker(size):
@@ -47,35 +67,32 @@ def talker(size):
 	to genTunnel (via callback()). explorer is updated in the process and we
 	can then call the navigation engine functions on it. A path is returned
 	and the next waypoint is published on the /next_wp topic'''
-	global explorer
+	global pubway
 	mapdata = Int8MultiArray()	
 	rospy.init_node('talker', anonymous=True)
 	pub = rospy.Publisher('mapprob', Int8MultiArray, queue_size=10)
-	pubway = rospy.Publisher('next_wps', PoseArray, queue_size=10)
-	rospy.Subscriber("nav_map", OccupancyGrid, callback)
+	pubway = rospy.Publisher('next_wps', Waypoints, queue_size=10)
+	rospy.Subscriber("nav_map", OccupancyGrid, occ_grid_cb)
+	rospy.spin()
+
+#	time.sleep(10)
 
 
-# So maybe just do it this way if needed. It seems that you think that
-# talker() gets called many times, but it is only called once.
-	time.sleep(10)
+	#shortest distance to consider and maximum range to use for navigation
+	#these work for a 30 x 30 but for a larger obstacle map may need to be
+	#larger. Some experimentation will be needed to find a good balance of
+	#performance
 
+#	shortestdistance = 3
+#	maxrange = 40
 
-#shortest distance to consider and maximum range to use for navigation
-#these work for a 30 x 30 but for a larger obstacle map may need to be
-#larger. Some experimentation will be needed to find a good balance of
-#performance
+	#get first move
+#	p = explorer.findClosestFrontier(size/2,size/2,maxrange,shortestdistance)
+#	last = False
 
-	shortestdistance = 3
-	maxrange = 40
-
-#get first move
-	p = explorer.findClosestFrontier(size/2,size/2,maxrange,shortestdistance)
-#	print '----------------------checkpoint--------------------'
-	last = False
-
-#while we still have moves and have not returned to home base navigate
-#around
-	while p is not None:
+	#while we still have moves and have not returned to home base navigate
+	#around
+#	while p is not None:
 #		for pp in p:
 #			#jva.awt.point uses floats so we cast back to integers here
 #			way = Point()
@@ -87,30 +104,30 @@ def talker(size):
 #			while not rospy.is_shutdown():
 #				pubway.publish(way)
 		#x_path,y_path = zip(*[(pp.getX(),pp,getY()) for pp in p])
-		ways = PoseArray()
-		for pp in p:
-			way = Pose()
-			way.position.x = int(pp.getX())
-			way.position.y = int(pp.getY())
-			ways.poses.append(way)
-		print(len(ways.poses))
-		pubway.publish(ways)
-		if last:
-			break
+	'''ways = PoseArray()
+	for pp in p:
+		way = Pose()
+		way.position.x = int(pp.getX())
+		way.position.y = int(pp.getY())
+		ways.poses.append(way)
+	print(len(ways.poses))
+	pubway.publish(ways)'''
+#		if last:
+#			break
 
 #get next path to explore wil return None if none found
 #none found usually implies we've fully explored the space provided but
 #may also mean that max range wasn't high enough or shortest distance to
 #consider was too long
 
-		p = explorer.findClosestFrontier(way.position.x,way.position.y,maxrange,shortestdistance)
+#		p = explorer.findClosestFrontier(way.position.x,way.position.y,maxrange,shortestdistance)
 
 #		print p
 #get path back home if no frontier was found to explore
 
-		if p is None and not last:
-			last = True
-			p = explorer.findPath(way.position.x,way.position.y,size,0,shortestdistance)
+#		if p is None and not last:
+#			last = True
+#			p = explorer.findPath(way.position.x,way.position.y,size,0,shortestdistance)
 
 if __name__ == '__main__':
 	global explorer

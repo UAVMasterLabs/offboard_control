@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 from __future__ import division
 import rospy
-from geometry_msgs.msg import PoseStamped, PoseArray
+from geometry_msgs.msg import PoseStamped
+from offboard.msg import Waypoints
 from tf.transformations import quaternion_from_euler as qfe
 from numpy import pi
 
 def setpoints(data):
 	global next_wp
 	x_dist,y_dist = [],[]
-	num_wps = len(data.poses)
-	print(data.poses)
-#	rospy.loginfo('%f,'*num_wps,data.poses)
-#	print(type(data.poses[0].position.x))
-	for pose in data.poses:
-#		if not pose.position.x is None or pose.position.y is None:
-		x_dist.append(pose.position.x - 32)*0.05
-		y_dist.append(pose.position.y - 32)*0.05
+	x_ways = data.x
+	y_ways = data.y
+	print(len(x_ways))
+	for i in range(len(x_ways)):
+		x_dist.append((x_ways[i] - 32.0)*0.05)
+		y_dist.append((y_ways[i] - 32.0)*0.05)
 	x_wps = [curr_x+x for x in x_dist]
 	y_wps = [curr_y+y for y in y_dist]
 	epsilon = 0.05
@@ -33,7 +32,7 @@ def wp_pub_sub():
 	global curr_x,curr_y,next_wp
 	next_wp.pose.position.z = 0.5
 	rospy.init_node('UAV_setpoint',log_level=rospy.DEBUG,anonymous=True)
-	rospy.Subscriber('next_wps',PoseArray,setpoints)
+	rospy.Subscriber('next_wps',Waypoints,setpoints)
 	rospy.Subscriber('slam_out_pose',PoseStamped,set_curr)
 	rate = rospy.Rate(15)
 	wp_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
