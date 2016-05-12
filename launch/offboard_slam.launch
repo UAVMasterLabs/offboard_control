@@ -33,7 +33,7 @@
         <param name="output_timing" value="false"/>
 
         <!--Map size/start point-->
-        <param name="map_resolution" value="0.05"/>
+        <param name="map_resolution" value="0.75"/>
         <param name="map_size" value="1024"/>
         <param name="map_start_x" value="0.5"/>
         <param name="map_start_y" value="0.5"/>
@@ -82,9 +82,9 @@
 <node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0 0 0 0 /base_link /laser 100"/>
 
 <!--###launch offboard scripts. These are the things we have written.###-->
-<node pkg="offboard" type="pos_set.py" name="UAV_setpoint"/>
+<!--node pkg="offboard" type="pos_set.py" name="UAV_setpoint"/-->
 
-<node pkg="offboard" type="vid_record.py" name="UAV_cam"/>
+<!--node pkg="offboard" type="vid_record.py" name="UAV_cam"/-->
 
 <node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
 
