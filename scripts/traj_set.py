@@ -42,8 +42,7 @@ def wp_pub_sub():
 		pos.header.stamp = rospy.Time.now()
 		pos.pose.position.x = next_wp.pose.position.x
 		pos.pose.position.y = next_wp.pose.position.y
-#		pos.pose.position.z = next_wp.pose.position.z
-		pos.pose.position.z = 0.75
+		pos.pose.position.z = next_wp.pose.position.z
 		quat = qfe(0,0,pi/2)
 		pos.pose.orientation.w = quat[3]
 		pos.pose.orientation.x = quat[0]
