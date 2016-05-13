@@ -90,7 +90,7 @@
 
 <node pkg="offboard" type="talker.py" name="UAV_nav"/>
 
-<node pkg="offboard" type="traj_set.py" name="UAV_path_planner"/>
+<!--node pkg="offboard" type="traj_set.py" name="UAV_path_planner"/-->
 
 <node pkg="offboard" type="map_reduction.py" name="UAV_nav_map"/>
 

@@ -47,7 +47,7 @@ def RealtimePlotter2(arg):
 if __name__ == "__main__":
     global x,y,p,grid_loc,ready
     ready = Bool()
-    ready.data = True
+    ready.data = False
     x, y = 0, 0
     nav_map_pub = rospy.Publisher('nav_map',OccupancyGrid,queue_size=2)
     subs()

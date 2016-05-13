@@ -34,7 +34,6 @@ def setpoints(data):
 			spin = True
 			while spin:
 				time.sleep(1)
-			ready_pub.publish(True)
 
 def set_curr(data):
 	global curr_x, curr_y, curr_orient
@@ -52,7 +51,7 @@ def wp_pub_sub():
 	wp_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
 	ready_pub = rospy.Publisher('ready_for_wps', Bool, queue_size=10)
 	spin_flag = 0
-	spin = False
+	spin = True
 	while not rospy.is_shutdown():
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
@@ -60,23 +59,33 @@ def wp_pub_sub():
 		pos.pose.position.y = next_wp.pose.position.y
 		pos.pose.position.z = next_wp.pose.position.z
 		if spin:
-			if spin_flag:
+			if spin_flag == 1:
 				rospy.loginfo("Yaw Left")
-				yaw = pi
-			else:
+				yaw = pi/2
+			elif spin_flag == 0:
 				rospy.loginfo("Yaw Right")
+				yaw = -pi/2
+			else:
+				rospy.loginfo("Yaw Back")
 				yaw = 0
-			quat = qfe(0,0,yaw)
+			quat = qfe(0,0,yaw+pi/2)
 			pos.pose.orientation.x = quat[0]
 			pos.pose.orientation.y = quat[1]
 			pos.pose.orientation.z = quat[2]
 			pos.pose.orientation.w = quat[3]
 			wp_pub.publish(pos)
-			curr_yaw = efq(curr_orient.x,curr_orient.y,curr_orient.z,curr_orient.w)[-1]
+			while not 'curr_orient' in globals():
+				time.sleep(0.01)
+			curr_yaw = efq([curr_orient.x,curr_orient.y,curr_orient.z,curr_orient.w])[-1]
+			rospy.loginfo('%s',str(curr_yaw))
+			rospy.loginfo('%s',str(yaw))
+			epsilon = 0.1
 			if abs(curr_yaw - yaw) < epsilon:
-				spin_flag ^= 1
+				spin_flag += 1
 				if yaw == 0:
 					spin = False
+					spin_flag = 0
+					ready_pub.publish(True)
 			rate.sleep()
 			continue
 		quat = qfe(0,0,pi/2)
