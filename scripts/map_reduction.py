@@ -8,7 +8,8 @@ from std_msgs.msg import Bool
 
 def occ_grid_cb(data):
     global p,ready
-    if not ready:
+    rospy.loginfo("occ_grid_cb() /ready_for_wps: %s",str(ready))
+    if not ready.data:
 	return
     nav_map = OccupancyGrid()
     w,h = data.info.width,data.info.height
@@ -26,7 +27,8 @@ def occ_grid_cb(data):
 
 def set_ready(data):
     global ready
-    ready = data.data
+    ready.data = data.data
+    rospy.loginfo("set_ready() /ready_for_wps: %s",str(ready))
 
 def get_curr_grid(data):
     global grid_loc
@@ -35,7 +37,7 @@ def get_curr_grid(data):
 def subs():
     rospy.init_node('UAV_nav_map')
     rospy.Subscriber('/gridout',Pose,get_curr_grid)
-    rospy.Subscriber('/nav_map',OccupancyGrid,occ_grid_cb)
+    rospy.Subscriber('/map',OccupancyGrid,occ_grid_cb)
     rospy.Subscriber('/ready_for_wps',Bool,set_ready)
     rospy.spin()
     
