@@ -23,3 +23,11 @@ Other useful topics to get info from:
 /ready_for_wps -- self-explanatory
 /next_wps -- in slam frame grid locations
 
+
+If you make any edits and test them to success, push out to the repo
+$git add -A
+$git commit
+# this will send you to nano. Write a quick descr of what you did
+#CTRL-x, y, ENTER to save and exit
+$git push
+#this will prompt for UN and PW
