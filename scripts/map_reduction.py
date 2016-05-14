@@ -35,7 +35,7 @@ def get_curr_grid(data):
 def subs():
     rospy.init_node('UAV_nav_map')
     rospy.Subscriber('/gridout',Pose,get_curr_grid)
-    rospy.Subscriber('/map',OccupancyGrid,occ_grid_cb)
+    rospy.Subscriber('/nav_map',OccupancyGrid,occ_grid_cb)
     rospy.Subscriber('/ready_for_wps',Bool,set_ready)
     rospy.spin()
     

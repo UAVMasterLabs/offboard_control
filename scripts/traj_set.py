@@ -61,10 +61,10 @@ def wp_pub_sub():
 		if spin:
 			if spin_flag == 1:
 				rospy.loginfo("Yaw Left")
-				yaw = pi/2
+				yaw = 3*pi/4
 			elif spin_flag == 0:
 				rospy.loginfo("Yaw Right")
-				yaw = -pi/2
+				yaw = -3*pi/4
 			else:
 				rospy.loginfo("Yaw Back")
 				yaw = 0
@@ -77,8 +77,7 @@ def wp_pub_sub():
 			while not 'curr_orient' in globals():
 				time.sleep(0.01)
 			curr_yaw = efq([curr_orient.x,curr_orient.y,curr_orient.z,curr_orient.w])[-1]
-			rospy.loginfo('%s',str(curr_yaw))
-			rospy.loginfo('%s',str(yaw))
+			rospy.loginfo('curr: %s, des: %s',str(curr_yaw),str(yaw))
 			epsilon = 0.1
 			if abs(curr_yaw - yaw) < epsilon:
 				spin_flag += 1

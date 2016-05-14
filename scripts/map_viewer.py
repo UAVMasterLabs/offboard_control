@@ -12,7 +12,7 @@ def print_map(data):
 	while not 'x_wps' in globals():
 		time.sleep(0.01)
 	for i in range(len(x_wps)):
-		data[-y_wps[i],x_wps[i]] = 3
+		data[x_wps[i],y_wps[i]] = 3
 	swap = {0:' ',-1:'o',100:'*',2:'^',3:'+'}
 	map = ''.join([swap[x] if i%64 else '\n'+swap[x] for i,x in enumerate(data.flatten())])
 	print map	
