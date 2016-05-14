@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+''' Takes global /map and returns surrounding local /nav_map'''
 from numpy import array
 import rospy
 from sensor_msgs.msg import PointCloud
@@ -14,14 +15,13 @@ def occ_grid_cb(data):
     nav_map = OccupancyGrid()
     w,h = data.info.width,data.info.height
     pt = data.data
-    p = array(pt).reshape(w,h)
+    p = array(pt).reshape(w,h)#.T #<-- Transposes
     if not 'grid_loc' in globals():
         return
     x,y  = grid_loc.position.x, grid_loc.position.y
     nav_map.info = data.info
     nav_map.info.width = 64
     nav_map.info.height = 64
-    print(p.shape)
     nav_map.data = p[int(x)-32:int(x)+32,int(y)-32:int(y)+32].flatten()
     nav_map_pub.publish(nav_map)
 

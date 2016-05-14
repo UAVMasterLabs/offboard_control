@@ -32,32 +32,20 @@ def genTunnel(mapdata):
 	print('I have the nav_map')
 	size = mapdata.info.width
 	data = mapdata.data
-	'''for ind in range (0,size*size):
-		y0 = divmod(ind,size)
-		x = y0[1]
-		y = y0[0]
-		if mapdata.data[ind]==-1:
-			explorer.addNode(y,x,False,False)
-		else:
-			if mapdata.data[ind]==100:
-				explorer.addNode(y,x,True,True)
-			else:
-				explorer.addNode(y,x,True,False)'''
 	explorer.initializeArray(size)
 	explorer.importHectorList(ListConverter().convert(data,gateway._gateway_client),1)
 	shortestdistance = 3
 	maxrange = 40
 
-	#get first move
 	p = explorer.findClosestFrontier(size/2,size/2,maxrange,shortestdistance)
 	ways = Waypoints()
 	x_ways, y_ways = [], []
 	for pp in p:
-		x_ways.append(int(pp.getX()))
+		x_ways.append(int(pp.getX()))  #Possible tranpose, but map_viewer works currently
 		y_ways.append(int(pp.getY()))
 	ways.x = x_ways
 	ways.y = y_ways
-	pubway.publish(ways)
+	pubway.publish(ways) #publishing x,y gridpoints
 
 
 
@@ -75,73 +63,20 @@ def talker(size):
 	rospy.Subscriber("nav_map", OccupancyGrid, occ_grid_cb)
 	rospy.spin()
 
-#	time.sleep(10)
-
-
-	#shortest distance to consider and maximum range to use for navigation
-	#these work for a 30 x 30 but for a larger obstacle map may need to be
-	#larger. Some experimentation will be needed to find a good balance of
-	#performance
-
-#	shortestdistance = 3
-#	maxrange = 40
-
-	#get first move
-#	p = explorer.findClosestFrontier(size/2,size/2,maxrange,shortestdistance)
-#	last = False
-
-	#while we still have moves and have not returned to home base navigate
-	#around
-#	while p is not None:
-#		for pp in p:
-#			#jva.awt.point uses floats so we cast back to integers here
-#			way = Point()
-#			x = int(pp.getX())
-#			y = int(pp.getY())
-#			way.x = x
-#			way.y = y
-#			n = explorer.getNode(x,y)
-#			while not rospy.is_shutdown():
-#				pubway.publish(way)
-		#x_path,y_path = zip(*[(pp.getX(),pp,getY()) for pp in p])
-	'''ways = PoseArray()
-	for pp in p:
-		way = Pose()
-		way.position.x = int(pp.getX())
-		way.position.y = int(pp.getY())
-		ways.poses.append(way)
-	print(len(ways.poses))
-	pubway.publish(ways)'''
-#		if last:
-#			break
-
-#get next path to explore wil return None if none found
-#none found usually implies we've fully explored the space provided but
-#may also mean that max range wasn't high enough or shortest distance to
-#consider was too long
-
-#		p = explorer.findClosestFrontier(way.position.x,way.position.y,maxrange,shortestdistance)
-
-#		print p
-#get path back home if no frontier was found to explore
-
-#		if p is None and not last:
-#			last = True
-#			p = explorer.findPath(way.position.x,way.position.y,size,0,shortestdistance)
 
 if __name__ == '__main__':
 	global explorer
 
-#instantiate the java gateway using py4j. This requires that py4j be installed
-#using sudo pip install py4j. navigation engine must be up and running using
-#java -jar navengine.jar
+	#instantiate the java gateway using py4j. This requires that py4j be installed
+	#using sudo pip install py4j. navigation engine must be up and running using
+	#java -jar navengine.jar
 	gateway = JavaGateway()
 	explorer = gateway.entry_point
 
-#must intialize the navigation map in engine to be same size as the map that
-#is passed in. This can be called multiple times if size changes. Be sure to
-#recopy in all data after resizing since this initializes everything to unexplored
-#and unobstructed
+	#must intialize the navigation map in engine to be same size as the map that
+	#is passed in. This can be called multiple times if size changes. Be sure to
+	#recopy in all data after resizing since this initializes everything to unexplored
+	#and unobstructed
 	size = 64
 
 	while True:
@@ -156,8 +91,6 @@ if __name__ == '__main__':
 			continue
 		else:
 			break
-
-#	flag = 0
 
 	try:
 		talker(size)

@@ -6,28 +6,35 @@ from std_msgs.msg import Bool
 from offboard.msg import Waypoints
 from tf.transformations import quaternion_from_euler as qfe
 from tf.transformations import euler_from_quaternion as efq
-from numpy import pi
+from numpy import pi,sqrt
 
 
 def setpoints(data):
 	global next_wp, ready_pub,spin
 	rospy.loginfo('Recieved waypoints')
-	ready_pub.publish(False)
+	ready_pub.publish(False) #let us execute the path before sending any more info to sentel
 	x_dist,y_dist = [],[]
 	x_ways = data.x
 	y_ways = data.y
 	num_wps = len(x_ways)
 	for i in range(num_wps):
-		x_dist.append((y_ways[i] - 32.0)*0.05)
-		y_dist.append(-(x_ways[i] - 32.0)*0.05)
+		x_dist.append((x_ways[i] - 32.0)*0.05) #subscpribe to grid waypoints
+		y_dist.append((y_ways[i] - 32.0)*0.05) # and translate to relative distance from current coordinate location
+						       # This is probably where x -> y, -y -> x should occur? Correct. Not done properly yet
+						       # Confirm this using rostpoic echo /mavros/setpoint_position/local? 
+	# To confirm. Kep doing your flight tests and see what setpooint_position/local vs /slam_out_pose look like
+	# and then make these waypoints look similar by some rotation to get good behavior
+	# You will know you have reched the waypoint when your setpoint changes to ask for a spin maneuver
+	# Once the spin is complete, map from map_viewer will update and you will get new translational waypoints
 	x_wps = [curr_x+x for x in x_dist]
 	y_wps = [curr_y+y for y in y_dist]
-	epsilon = 0.025
+	epsilon = 0.10 #cm radius for achieved waypoint
 	for i in range(num_wps):
 		dx = abs(x_wps[i] - curr_x)
 		dy = abs(y_wps[i] - curr_y)
+		radius = sqrt(dx**2 + dy**2) #Find norm
 		rospy.loginfo("dx: %s\ndy: %s",str(dx),str(dy))
-		while dx > epsilon or dy > epsilon :
+		while radius > epsilon:
 			next_wp.pose.position.x = x_wps[i]
 			next_wp.pose.position.y = y_wps[i]
 		if i == num_wps-1:
@@ -56,10 +63,11 @@ def wp_pub_sub():
 	while not rospy.is_shutdown():
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
-		pos.pose.position.x = next_wp.pose.position.x
+		pos.pose.position.x = next_wp.pose.position.x #these lines could also be changed instead of above
 		pos.pose.position.y = next_wp.pose.position.y
-		pos.pose.position.z = next_wp.pose.position.z
+		pos.pose.position.z = next_wp.pose.position.z #this line can be changed to reflect desired z setpoints
 		if spin:
+			# Yaw is in /slam_out_pose frame.
 			if spin_flag == 1:
 				rospy.loginfo("Yaw Left")
 				yaw = 3*pi/4
@@ -69,7 +77,8 @@ def wp_pub_sub():
 			else:
 				rospy.loginfo("Yaw Back")
 				yaw = 0
-			quat = qfe(0,0,yaw+pi/2)
+			quat = qfe(0,0,yaw+pi/2)#euler angles -- RPY roll pitch yaw --> Q xyzw 
+						#add pi/2 to send to setpoint_position/local
 			pos.pose.orientation.x = quat[0]
 			pos.pose.orientation.y = quat[1]
 			pos.pose.orientation.z = quat[2]
@@ -85,9 +94,9 @@ def wp_pub_sub():
 				if yaw == 0:
 					spin = False
 					spin_flag = 0
-					ready_pub.publish(True)
+					ready_pub.publish(True) #ready for more waypoints. send nav_map to sentel
 			rate.sleep()
-			continue
+			continue # this tells us to skip everything else in the loop and start from the top, (skip next 7 lines)
 		quat = qfe(0,0,pi/2)
 		pos.pose.orientation.x = quat[0]
 		pos.pose.orientation.y = quat[1]
