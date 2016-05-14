@@ -11,6 +11,7 @@ from numpy import pi
 
 def setpoints(data):
 	global next_wp, ready_pub,spin
+	rospy.loginfo('Recieved waypoints')
 	ready_pub.publish(False)
 	x_dist,y_dist = [],[]
 	x_ways = data.x
