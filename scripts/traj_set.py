@@ -8,7 +8,6 @@ from tf.transformations import quaternion_from_euler as qfe
 from tf.transformations import euler_from_quaternion as efq
 from numpy import pi,sqrt
 
-
 def setpoints(data):
 	global next_wp, ready_pub,spin
 	rospy.loginfo('Recieved waypoints')
@@ -28,7 +27,7 @@ def setpoints(data):
 	# Once the spin is complete, map from map_viewer will update and you will get new translational waypoints
 	x_wps = [curr_x+x for x in x_dist]
 	y_wps = [curr_y+y for y in y_dist]
-	epsilon = 0.10 #cm radius for achieved waypoint
+	epsilon = 0.50 #cm radius for achieved waypoint
 	for i in range(num_wps):
 		dx = abs(x_wps[i] - curr_x)
 		dy = abs(y_wps[i] - curr_y)
@@ -48,7 +47,6 @@ def set_curr(data):
 	curr_x,curr_y = data.pose.position.x, data.pose.position.y
 	curr_orient = data.pose.orientation
 
-
 def wp_pub_sub():
 	global curr_x,curr_y,curr_orient,next_wp,ready_pub,spin
 	next_wp.pose.position.z = 0.5
@@ -63,8 +61,8 @@ def wp_pub_sub():
 	while not rospy.is_shutdown():
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
-		pos.pose.position.x = next_wp.pose.position.x #these lines could also be changed instead of above
-		pos.pose.position.y = next_wp.pose.position.y
+		pos.pose.position.x = -next_wp.pose.position.y #these lines could also be changed instead of above
+		pos.pose.position.y = next_wp.pose.position.x
 		pos.pose.position.z = next_wp.pose.position.z #this line can be changed to reflect desired z setpoints
 		if spin:
 			# Yaw is in /slam_out_pose frame.
@@ -104,7 +102,6 @@ def wp_pub_sub():
 		pos.pose.orientation.w = quat[3]
 		wp_pub.publish(pos)
 		rate.sleep()
-
 
 if __name__ == '__main__':
 	global curr_x,curr_y,next_wp
