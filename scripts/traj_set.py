@@ -17,11 +17,11 @@ def setpoints(data):
 	y_ways = data.y
 	num_wps = len(x_ways)
 	for i in range(num_wps):
-		x_dist.append((x_ways[i] - 32.0)*0.05) #subscpribe to grid waypoints
-		y_dist.append((y_ways[i] - 32.0)*0.05) # and translate to relative distance from current coordinate location
+		x_dist.append((y_ways[i] - 32.0)*0.05) #subscpribe to grid waypoints
+		y_dist.append(-(x_ways[i] - 32.0)*0.05) # and translate to relative distance from current coordinate location
 						       # This is probably where x -> y, -y -> x should occur? Correct. Not done properly yet
 						       # Confirm this using rostpoic echo /mavros/setpoint_position/local? 
-	# To confirm. Kep doing your flight tests and see what setpooint_position/local vs /slam_out_pose look like
+	# To confirm, keep doing your flight tests and see what setpoint_position/local vs /slam_out_pose look like
 	# and then make these waypoints look similar by some rotation to get good behavior
 	# You will know you have reched the waypoint when your setpoint changes to ask for a spin maneuver
 	# Once the spin is complete, map from map_viewer will update and you will get new translational waypoints
@@ -32,8 +32,11 @@ def setpoints(data):
 		dx = abs(x_wps[i] - curr_x)
 		dy = abs(y_wps[i] - curr_y)
 		radius = sqrt(dx**2 + dy**2) #Find norm
-		rospy.loginfo("dx: %s\ndy: %s",str(dx),str(dy))
 		while radius > epsilon:
+			dx = abs(x_wps[i] - curr_x)
+			dy = abs(y_wps[i] - curr_y)
+			radius = sqrt(dx**2 + dy**2) #Find norm
+			#rospy.loginfo("curr_x: %s, des_x: %s, curr_y: %s, des_y: %s, rad: %s",str(curr_x)[:4],str(x_wps[i])[:4],str(curr_y)[:4],str(y_wps[i])[:4],str(radius)[:4])
 			next_wp.pose.position.x = x_wps[i]
 			next_wp.pose.position.y = y_wps[i]
 		if i == num_wps-1:
