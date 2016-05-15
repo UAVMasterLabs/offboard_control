@@ -46,8 +46,8 @@ def setpoints(data):
 				time.sleep(1)
 
 def set_curr(data):
-	global curr_x, curr_y, curr_orient
-	curr_x,curr_y = data.pose.position.x, data.pose.position.y
+	global curr_x, curr_y, curr_z, curr_orient
+	curr_x,curr_y,curr_z = data.pose.position.x, data.pose.position.y, data.pose.position.z
 	curr_orient = data.pose.orientation
 
 def wp_pub_sub():
@@ -60,13 +60,15 @@ def wp_pub_sub():
 	wp_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
 	ready_pub = rospy.Publisher('ready_for_wps', Bool, queue_size=10)
 	spin_flag = 0
-	spin = True
+	spin = False
 	while not rospy.is_shutdown():
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
 		pos.pose.position.x = -next_wp.pose.position.y #these lines could also be changed instead of above
 		pos.pose.position.y = next_wp.pose.position.x
 		pos.pose.position.z = next_wp.pose.position.z #this line can be changed to reflect desired z setpoints
+		if curr_z > 0.3:
+			spin = True
 		if spin:
 			# Yaw is in /slam_out_pose frame.
 			if spin_flag == 1:
