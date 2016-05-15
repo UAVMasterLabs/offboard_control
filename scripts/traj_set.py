@@ -70,12 +70,15 @@ def wp_pub_sub():
 	while not rospy.is_shutdown():
 		if 'mode' in globals() and mode in "OFFBOARD":
 			offboard_counter += 1
+			if offboard_counter == 1:
+				rospy.loginfo("Just entered OFFBOARD mode")
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
-		pos.pose.position.x = -next_wp.pose.position.y #these lines could also be changed instead of above
-		pos.pose.position.y = next_wp.pose.position.x
+		pos.pose.position.x = next_wp.pose.position.x #these lines could also be changed instead of above
+		pos.pose.position.y = next_wp.pose.position.y
 		pos.pose.position.z = next_wp.pose.position.z #this line can be changed to reflect desired z setpoints
 		if spins == 0 and 'curr_z' in globals() and curr_z > 0.3 and offboard_counter >= 150:
+			rospy.loginfo("executing first spin maneuver")
 			spin = True
 #		if spins%5:
 		if spin:
