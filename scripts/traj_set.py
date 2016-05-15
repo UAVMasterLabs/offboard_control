@@ -50,8 +50,12 @@ def set_curr(data):
 	curr_x,curr_y,curr_z = data.pose.position.x, data.pose.position.y, data.pose.position.z
 	curr_orient = data.pose.orientation
 
+def get_curr_mode(data):
+	global mode
+	mode = data.mode
+
 def wp_pub_sub():
-	global curr_x,curr_y,curr_orient,next_wp,ready_pub,spin
+	global curr_x,curr_y,curr_orient,next_wp,ready_pub,spin,mode
 	next_wp.pose.position.z = 0.5
 	rospy.init_node('UAV_setpoint',log_level=rospy.DEBUG,anonymous=True)
 	rospy.Subscriber('next_wps',Waypoints,setpoints)
@@ -62,14 +66,18 @@ def wp_pub_sub():
 	spin_flag = 0
 	spin = False
 	spins = 0 
+	offboard_counter = 0
 	while not rospy.is_shutdown():
+		if 'mode' in globals() and mode in "OFFBOARD":
+			offboard_counter += 1
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
 		pos.pose.position.x = -next_wp.pose.position.y #these lines could also be changed instead of above
 		pos.pose.position.y = next_wp.pose.position.x
 		pos.pose.position.z = next_wp.pose.position.z #this line can be changed to reflect desired z setpoints
-		if spins == 0 and curr_z > 0.3:
+		if spins == 0 and 'curr_z' in globals() and curr_z > 0.3 and offboard_counter >= 150:
 			spin = True
+#		if spins%5:
 		if spin:
 			# Yaw is in /slam_out_pose frame.
 			if spin_flag == 1:
