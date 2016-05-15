@@ -2,8 +2,8 @@
 
 	<!--###launch mavros node. Actual node is in file ".../offboard/launch.node.launch"###-->
 	<arg name="fcu_url" default="/dev/ttyAMA0:921600" />
-        <arg name="gcs_url" default="udp://:14556@192.168.0.116:14550" />
-        <!--arg name="gcs_url" default="" /-->
+        <!--arg name="gcs_url" default="udp://:14556@192.168.0.116:14550" /-->
+        <arg name="gcs_url" default="" />
         <arg name="tgt_system" default="1" />
         <arg name="tgt_component" default="1" />
         <arg name="log_output" default="screen" />
@@ -92,7 +92,7 @@
 
 <node pkg="offboard" type="path_finder.py" name="UAV_nav"/>
 
-<!--node pkg="offboard" type="traj_set.py" name="UAV_path_planner"/-->
+<node pkg="offboard" type="traj_set.py" name="UAV_path_planner"/>
 
 <node pkg="offboard" type="map_reduction.py" name="UAV_nav_map"/>
 

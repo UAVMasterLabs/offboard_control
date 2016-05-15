@@ -40,6 +40,9 @@ def genTunnel(mapdata):
 	p = explorer.findClosestFrontier(size/2,size/2,maxrange,shortestdistance)
 	ways = Waypoints()
 	x_ways, y_ways = [], []
+	if p is None:
+		rospy.loginfo("No path found! Go home!.")
+		return
 	for pp in p:
 		x_ways.append(int(pp.getX()))  #Possible tranpose, but map_viewer works currently
 		y_ways.append(int(pp.getY()))

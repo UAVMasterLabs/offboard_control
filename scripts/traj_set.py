@@ -27,7 +27,7 @@ def setpoints(data):
 	# Once the spin is complete, map from map_viewer will update and you will get new translational waypoints
 	x_wps = [curr_x+x for x in x_dist]
 	y_wps = [curr_y+y for y in y_dist]
-	epsilon = 0.50 #cm radius for achieved waypoint
+	epsilon = 0.10 #m radius for achieved waypoint
 	for i in range(num_wps):
 		dx = abs(x_wps[i] - curr_x)
 		dy = abs(y_wps[i] - curr_y)

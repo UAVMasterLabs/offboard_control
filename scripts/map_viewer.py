@@ -14,7 +14,7 @@ def print_map(data):
 	for i in range(len(x_wps)):
 		data[x_wps[i],y_wps[i]] = 3
 	swap = {0:' ',-1:'o',100:'*',2:'R',3:'+'}
-	map = ''.join([swap[x] if i%64 else '\n'+swap[x] for i,x in enumerate(data.flatten())])
+	map = ''.join([swap[x] if i%64 else '\n'+swap[x] for i,x in enumerate(data.T.flatten())])
 	print map	
 
 def set_wps(data):
