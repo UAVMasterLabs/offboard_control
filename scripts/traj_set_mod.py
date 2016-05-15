@@ -61,14 +61,13 @@ def wp_pub_sub():
 	ready_pub = rospy.Publisher('ready_for_wps', Bool, queue_size=10)
 	spin_flag = 0
 	spin = False
-	spins = 0 
 	while not rospy.is_shutdown():
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
 		pos.pose.position.x = -next_wp.pose.position.y #these lines could also be changed instead of above
 		pos.pose.position.y = next_wp.pose.position.x
 		pos.pose.position.z = next_wp.pose.position.z #this line can be changed to reflect desired z setpoints
-		if spins == 0 and curr_z > 0.3:
+		if curr_z > 0.3:
 			spin = True
 		if spin:
 			# Yaw is in /slam_out_pose frame.
@@ -99,7 +98,6 @@ def wp_pub_sub():
 					spin = False
 					spin_flag = 0
 					ready_pub.publish(True) #ready for more waypoints. send nav_map to sentel
-					spins += 1
 			rate.sleep()
 			continue # this tells us to skip everything else in the loop and start from the top, (skip next 7 lines)
 		quat = qfe(0,0,pi/2)
