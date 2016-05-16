@@ -48,6 +48,7 @@ def setpoints(data):
 			spin = True
 			while spin:
 				time.sleep(1)
+			first_pub.publish(True)
 
 def set_curr(data):
 	global curr_x, curr_y, curr_z, curr_orient
@@ -68,7 +69,7 @@ def get_rtl(data):
 	rtl = data.data
 
 def wp_pub_sub():
-	global curr_x,curr_y,curr_orient,next_wp,ready_pub,spin,mode,size,rtl,all_waypoints
+	global curr_x,curr_y,curr_orient,next_wp,ready_pub,spin,mode,size,rtl,all_waypoints,first_pub
 	next_wp.pose.position.z = 0.5
 	all_waypoints = Waypoints()
 	rospy.init_node('UAV_setpoint',anonymous=True)
@@ -80,6 +81,7 @@ def wp_pub_sub():
 	ready_pub = rospy.Publisher('ready_for_wps', Bool, queue_size=10)
 	rtl_pub = rospy.Publisher('return_to_launch', Bool, queue_size=10)
 	rtl_path_pub = rospy.Publisher('next_wps', Waypoints, queue_size=10)
+	first_pub = rospy.Publisher('first_wps', Bool, queue_size=10)
 	spin_flag = 0
 	spin = False
 	spins = 0 
@@ -99,6 +101,7 @@ def wp_pub_sub():
 		if spins == 0 and 'curr_z' in globals() and curr_z > 0.3 and offboard_counter >= 150:
 			rospy.loginfo("executing first spin maneuver")
 			spin = True
+			first_pub.publish(True)
 		if spins%5:
 			spin = False
 		if spin:

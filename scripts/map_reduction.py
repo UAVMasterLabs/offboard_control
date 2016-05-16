@@ -8,7 +8,7 @@ from geometry_msgs.msg import Pose
 from std_msgs.msg import Bool, Int16
 
 def occ_grid_cb(data):
-    global p,ready
+    global p,ready,first
     rospy.loginfo("occ_grid_cb() /ready_for_wps: %s",str(ready))
     if not ready.data:
 	return
@@ -27,7 +27,10 @@ def occ_grid_cb(data):
 	pass
     nav_map.info.width = size
     nav_map.info.height = size
-    nav_map.data = p[int(x)-size/2:int(x)+size/2,int(y)-size/2:int(y)+size/2].flatten()
+    tmp_map = p[int(x)-size/2:int(x)+size/2,int(y)-size/2:int(y)+size/2]
+    if first:
+        tmp_map[:size/4,:] = 100
+    nav_map.data = tmp_map.flatten()
     nav_map_pub.publish(nav_map)
 
 def set_ready(data):
@@ -39,6 +42,10 @@ def set_rtl(data):
     global rtl
     rtl = data.data
 
+def set_first(data):
+    global first
+    first = data.data
+
 def get_curr_grid(data):
     global grid_loc
     grid_loc = data
@@ -48,11 +55,13 @@ def subs():
     rospy.Subscriber('/gridout',Pose,get_curr_grid)
     rospy.Subscriber('/map',OccupancyGrid,occ_grid_cb)
     rospy.Subscriber('/ready_for_wps',Bool,set_ready)
+    rospy.Subscriber('/first_wps',Bool,set_first)
     rospy.spin()
     
 
 if __name__ == "__main__":
-    global x,y,p,grid_loc,ready,rtl
+    global x,y,p,grid_loc,ready,rtl,first
+    first = False
     rtl = False
     ready = Bool()
     ready.data = False
