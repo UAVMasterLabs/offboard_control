@@ -4,7 +4,7 @@ from mavros_msgs.msg import State
 from std_msgs.msg import String
 
 import picamera
-from time import ctime
+from time import ctime,time
 
 from threading import Thread
 
@@ -31,12 +31,15 @@ def record():
 		cam.resolution = (640,480)
 		cam.rotation = 180
 		while not rospy.is_shutdown():
+			start = time()
 			now = ctime().replace(' ','_').replace(':','-')
 			if Record:
 				cam.start_recording('/media/tunnel_usb/tunnel_test'+now+'.h264')
 				rospy.loginfo('Vid recording started')
 				while Record:
 					cam.wait_recording(1)
+					if not int(time() - start)%60:
+						geotiff_pub.publish('savegeotiff')
 				cam.stop_recording()
 				geotiff_pub.publish('savegeotiff')
 				rospy.loginfo('Vid recording stopped')

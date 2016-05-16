@@ -5,7 +5,7 @@ import rospy
 from sensor_msgs.msg import PointCloud
 from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import Pose
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Int16
 
 def occ_grid_cb(data):
     global p,ready
@@ -20,15 +20,24 @@ def occ_grid_cb(data):
         return
     x,y  = grid_loc.position.x, grid_loc.position.y
     nav_map.info = data.info
-    nav_map.info.width = 64
-    nav_map.info.height = 64
-    nav_map.data = p[int(x)-32:int(x)+32,int(y)-32:int(y)+32].flatten()
+    if not 'size' in globals():
+	size = 64
+    if 'rtl' in globals() and rtl:
+        ##Intelligently set mapsize, scale map, and send waypoints to home
+	pass
+    nav_map.info.width = size
+    nav_map.info.height = size
+    nav_map.data = p[int(x)-size/2:int(x)+size/2,int(y)-size/2:int(y)+size/2].flatten()
     nav_map_pub.publish(nav_map)
 
 def set_ready(data):
     global ready
     ready.data = data.data
     rospy.loginfo("set_ready() /ready_for_wps: %s",str(ready))
+
+def set_rtl(data):
+    global rtl
+    rtl = data.data
 
 def get_curr_grid(data):
     global grid_loc
@@ -41,13 +50,10 @@ def subs():
     rospy.Subscriber('/ready_for_wps',Bool,set_ready)
     rospy.spin()
     
-def RealtimePlotter2(arg):
-    global p,grid_loc
-    print p.shape,p.max(),p.min()
-
 
 if __name__ == "__main__":
-    global x,y,p,grid_loc,ready
+    global x,y,p,grid_loc,ready,rtl
+    rtl = False
     ready = Bool()
     ready.data = False
     x, y = 0, 0

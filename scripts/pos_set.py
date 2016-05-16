@@ -60,8 +60,8 @@ def pos_set():
         elif 150 <= frame_id < 300:
                 pos = PoseStamped()
                 pos.header.stamp = rospy.Time.now()
-                pos.pose.position.x=0.75
-                pos.pose.position.y=0
+                pos.pose.position.x=0
+                pos.pose.position.y=1
                 pos.pose.position.z=0.5
                 quat = qfe(0,0,pi/2)
                 pos.pose.orientation.w = quat[3]
@@ -85,7 +85,7 @@ def pos_set():
                 pos = PoseStamped()
                 pos.header.stamp = rospy.Time.now()
                 pos.pose.position.x=0
-                pos.pose.position.y=0.75
+                pos.pose.position.y=0
                 pos.pose.position.z=0.5
                 quat = qfe(0,0,pi/2)
                 pos.pose.orientation.w = quat[3]

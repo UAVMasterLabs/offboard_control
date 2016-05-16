@@ -3,7 +3,8 @@
 	<!--###launch mavros node. Actual node is in file ".../offboard/launch.node.launch"###-->
 	<arg name="fcu_url" default="/dev/ttyAMA0:921600" />
         <!--arg name="gcs_url" default="udp://:14556@192.168.0.116:14550" /-->
-        <arg name="gcs_url" default="" />
+        <arg name="gcs_url" default="udp://:14556@10.42.0.1:14550" />
+        <!--arg name="gcs_url" default="" /-->
         <arg name="tgt_system" default="1" />
         <arg name="tgt_component" default="1" />
         <arg name="log_output" default="screen" />
@@ -56,12 +57,18 @@
 
 </node>
 
-<arg name="geotiff_map_file_path" default="$(find hector_geotiff)/maps"/>
+<arg name="geotiff_map_file_path" default="/media/tunnel_usb/"/>
 
 <include file="$(find hector_geotiff)/launch/geotiff_mapper.launch">
 	<arg name="trajectory_source_frame_name" value="scanmatcher_frame"/>
 	<arg name="map_file_path" value="$(arg geotiff_map_file_path)"/>
 </include>
+
+
+  <!--node pkg="hector_imu_tools" type="pose_and_orientation_to_imu_node" name="pose_and_orientation_to_imu_node" output="screen"-->
+    <!--remap from="/mavros/imu/data" to="/imu_in" /-->
+
+  <!--/node-->
 
 
 
@@ -95,6 +102,8 @@
 <node pkg="offboard" type="traj_set.py" name="UAV_path_planner" output="screen"/>
 
 <node pkg="offboard" type="map_reduction.py" name="UAV_nav_map"/>
+
+<node pkg="offboard" type="reboot_pix.py" name="UAV_rebooter"/>
 
 <node pkg="offboard" type="grid_sub.py" name="UAV_grid_loc"/>
 

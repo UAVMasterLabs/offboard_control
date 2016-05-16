@@ -9,7 +9,7 @@ import time
 import os
 from nav_msgs.msg import OccupancyGrid
 from std_msgs.msg import Int8MultiArray
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from geometry_msgs.msg import Pose
 from offboard.msg import Waypoints
 
@@ -28,7 +28,7 @@ def genTunnel(mapdata):
 	and path plan in another subscription service. We will do this
 	if we notice data is getting corrupted or the state of explorer
 	is unclear'''
-	global explorer,ways,pubway
+	global explorer,ways,pubway,rtl_pub
 	print('I have the nav_map')
 	size = mapdata.info.width
 	data = mapdata.data
@@ -42,6 +42,7 @@ def genTunnel(mapdata):
 	x_ways, y_ways = [], []
 	if p is None:
 		rospy.loginfo("No path found! Go home!.")
+		rtl_pub.publish(True)
 		return
 	for pp in p:
 		x_ways.append(int(pp.getX()))  #Possible tranpose, but map_viewer works currently
@@ -58,11 +59,12 @@ def talker(size):
 	to genTunnel (via callback()). explorer is updated in the process and we
 	can then call the navigation engine functions on it. A path is returned
 	and the next waypoint is published on the /next_wp topic'''
-	global pubway
+	global pubway, rtl_pub
 	mapdata = Int8MultiArray()	
 	rospy.init_node('talker', anonymous=True)
-	pub = rospy.Publisher('mapprob', Int8MultiArray, queue_size=10)
 	pubway = rospy.Publisher('next_wps', Waypoints, queue_size=10)
+	rtl_pub = rospy.Publisher('return_to_launch', Bool, queue_size=10)
+	rtl_pub.publish(False)
 	rospy.Subscriber("nav_map", OccupancyGrid, occ_grid_cb)
 	rospy.spin()
 

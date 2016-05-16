@@ -9,7 +9,7 @@ from tf.transformations import euler_from_quaternion as efq
 from numpy import pi,sqrt
 
 def setpoints(data):
-	global next_wp, ready_pub,spin
+	global next_wp, ready_pub,spin,size,all_waypoints, rtl
 	rospy.loginfo('Recieved waypoints')
 	ready_pub.publish(False) #let us execute the path before sending any more info to sentel
 	x_dist,y_dist = [],[]
@@ -17,8 +17,8 @@ def setpoints(data):
 	y_ways = data.y
 	num_wps = len(x_ways)
 	for i in range(num_wps):
-		x_dist.append((y_ways[i] - 32.0)*0.05) #subscpribe to grid waypoints
-		y_dist.append(-(x_ways[i] - 32.0)*0.05) # and translate to relative distance from current coordinate location
+		x_dist.append((y_ways[i] - size/2)*0.05) #subscpribe to grid waypoints
+		y_dist.append(-(x_ways[i] - size/2)*0.05) # and translate to relative distance from current coordinate location
 						       # This is probably where x -> y, -y -> x should occur? Correct. Not done properly yet
 						       # Confirm this using rostpoic echo /mavros/setpoint_position/local? 
 	# To confirm, keep doing your flight tests and see what setpoint_position/local vs /slam_out_pose look like
@@ -27,6 +27,8 @@ def setpoints(data):
 	# Once the spin is complete, map from map_viewer will update and you will get new translational waypoints
 	x_wps = [curr_x+x for x in x_dist]
 	y_wps = [curr_y+y for y in y_dist]
+	all_waypoints.x = all_waypoints.x + x_wps
+	all_waypoints.y = all_waypoints.y + y_wps
 	epsilon = 0.10 #m radius for achieved waypoint
 	for i in range(num_wps):
 		dx = abs(x_wps[i] - curr_x)
@@ -40,6 +42,8 @@ def setpoints(data):
 			next_wp.pose.position.x = x_wps[i]
 			next_wp.pose.position.y = y_wps[i]
 		if i == num_wps-1:
+			if rtl:
+				next_wp.pose.position.z = 0
 			rospy.loginfo("Spin Maneuver")
 			spin = True
 			while spin:
@@ -54,19 +58,34 @@ def get_curr_mode(data):
 	global mode
 	mode = data.mode
 
+def get_voltage(data):
+	global rtl
+	if data.voltage < 11.8:
+		rtl = True
+
+def get_rtl(data):
+	global rtl
+	rtl = data.data
+
 def wp_pub_sub():
-	global curr_x,curr_y,curr_orient,next_wp,ready_pub,spin,mode
+	global curr_x,curr_y,curr_orient,next_wp,ready_pub,spin,mode,size,rtl,all_waypoints
 	next_wp.pose.position.z = 0.5
-	rospy.init_node('UAV_setpoint',log_level=rospy.DEBUG,anonymous=True)
+	all_waypoints = Waypoints()
+	rospy.init_node('UAV_setpoint',anonymous=True)
 	rospy.Subscriber('next_wps',Waypoints,setpoints)
 	rospy.Subscriber('slam_out_pose',PoseStamped,set_curr)
+	rospy.Subscriber('return_to_launch',Bool,get_rtl)
 	rate = rospy.Rate(15)
 	wp_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
 	ready_pub = rospy.Publisher('ready_for_wps', Bool, queue_size=10)
+	rtl_pub = rospy.Publisher('return_to_launch', Bool, queue_size=10)
+	rtl_path_pub = rospy.Publisher('next_wps', Waypoints, queue_size=10)
 	spin_flag = 0
 	spin = False
 	spins = 0 
 	offboard_counter = 0
+	rtl_flag = 0
+	size = 128
 	while not rospy.is_shutdown():
 		if 'mode' in globals() and mode in "OFFBOARD":
 			offboard_counter += 1
@@ -80,7 +99,8 @@ def wp_pub_sub():
 		if spins == 0 and 'curr_z' in globals() and curr_z > 0.3 and offboard_counter >= 150:
 			rospy.loginfo("executing first spin maneuver")
 			spin = True
-#		if spins%5:
+		if spins%5:
+			spin = False
 		if spin:
 			# Yaw is in /slam_out_pose frame.
 			if spin_flag == 1:
@@ -113,6 +133,13 @@ def wp_pub_sub():
 					spins += 1
 			rate.sleep()
 			continue # this tells us to skip everything else in the loop and start from the top, (skip next 7 lines)
+		if rtl and not rtl_flag:
+			rtl_flag = 1
+			rtl_pub.publish(True)
+			rtl_wps = Waypoints()
+			rtl_wps.x = list(reversed(all_waypoints.x))
+			rtl_wps.y = list(reversed(all_waypoints.y))
+			rtl_path_pub.publish(rtl_wps)
 		quat = qfe(0,0,pi/2)
 		pos.pose.orientation.x = quat[0]
 		pos.pose.orientation.y = quat[1]
