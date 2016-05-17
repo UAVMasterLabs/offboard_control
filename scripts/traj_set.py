@@ -39,7 +39,7 @@ def setpoints(data):
 			dx = abs(x_wps[i] - curr_x)
 			dy = abs(y_wps[i] - curr_y)
 			radius = sqrt(dx**2 + dy**2) #Find norm
-			rospy.loginfo("curr_x: %s, des_x: %s, curr_y: %s, des_y: %s, rad: %s",str(curr_x)[:4],str(x_wps[i])[:4],str(curr_y)[:4],str(y_wps[i])[:4],str(radius)[:4])
+			rospy.loginfo("c_x: %s, d_x: %s -- c_y: %s, d_y: %s -- rad: %s",str(curr_x)[:4],str(x_wps[i])[:4],str(curr_y)[:4],str(y_wps[i])[:4],str(radius)[:4])
 			next_wp.pose.position.x = x_wps[i]
 			next_wp.pose.position.y = y_wps[i]
 		if i == num_wps-1:
