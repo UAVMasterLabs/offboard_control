@@ -29,7 +29,7 @@ def occ_grid_cb(data):
     nav_map.info.height = size
     tmp_map = p[int(x)-size/2:int(x)+size/2,int(y)-size/2:int(y)+size/2]
     if first:
-        tmp_map[:size/4,:] = 100
+        tmp_map[:,:size/2-1] = 100
     nav_map.data = tmp_map.flatten()
     nav_map_pub.publish(nav_map)
 

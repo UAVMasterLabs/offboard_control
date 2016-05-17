@@ -4,6 +4,7 @@ import rospy, time
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool
 from offboard.msg import Waypoints
+from mavros_msgs.msg import State
 from tf.transformations import quaternion_from_euler as qfe
 from tf.transformations import euler_from_quaternion as efq
 from numpy import pi,sqrt
@@ -38,7 +39,7 @@ def setpoints(data):
 			dx = abs(x_wps[i] - curr_x)
 			dy = abs(y_wps[i] - curr_y)
 			radius = sqrt(dx**2 + dy**2) #Find norm
-			#rospy.loginfo("curr_x: %s, des_x: %s, curr_y: %s, des_y: %s, rad: %s",str(curr_x)[:4],str(x_wps[i])[:4],str(curr_y)[:4],str(y_wps[i])[:4],str(radius)[:4])
+			rospy.loginfo("curr_x: %s, des_x: %s, curr_y: %s, des_y: %s, rad: %s",str(curr_x)[:4],str(x_wps[i])[:4],str(curr_y)[:4],str(y_wps[i])[:4],str(radius)[:4])
 			next_wp.pose.position.x = x_wps[i]
 			next_wp.pose.position.y = y_wps[i]
 		if i == num_wps-1:
@@ -51,9 +52,13 @@ def setpoints(data):
 			first_pub.publish(True)
 
 def set_curr(data):
-	global curr_x, curr_y, curr_z, curr_orient
-	curr_x,curr_y,curr_z = data.pose.position.x, data.pose.position.y, data.pose.position.z
+	global curr_x, curr_y, curr_orient
+	curr_x,curr_y = data.pose.position.x, data.pose.position.y
 	curr_orient = data.pose.orientation
+
+def set_curr_z(data):
+	global curr_z
+	curr_z = data.pose.position.z
 
 def get_curr_mode(data):
 	global mode
@@ -74,7 +79,9 @@ def wp_pub_sub():
 	all_waypoints = Waypoints()
 	rospy.init_node('UAV_setpoint',anonymous=True)
 	rospy.Subscriber('next_wps',Waypoints,setpoints)
+	rospy.Subscriber('/mavros/state',State,get_curr_mode)
 	rospy.Subscriber('slam_out_pose',PoseStamped,set_curr)
+	rospy.Subscriber('/mavros/local_position/pose',PoseStamped,set_curr_z)
 	rospy.Subscriber('return_to_launch',Bool,get_rtl)
 	rate = rospy.Rate(15)
 	wp_pub = rospy.Publisher('/mavros/setpoint_position/local', PoseStamped, queue_size=10)
@@ -84,20 +91,23 @@ def wp_pub_sub():
 	first_pub = rospy.Publisher('first_wps', Bool, queue_size=10)
 	spin_flag = 0
 	spin = False
-	spins = 0 
+	spins = 0
 	offboard_counter = 0
 	rtl_flag = 0
 	size = 128
 	while not rospy.is_shutdown():
 		if 'mode' in globals() and mode in "OFFBOARD":
 			offboard_counter += 1
-			if offboard_counter == 1:
+			#rospy.loginfo(str(offboard_counter))
+			if offboard_counter <= 5:
 				rospy.loginfo("Just entered OFFBOARD mode")
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
 		pos.pose.position.x = next_wp.pose.position.x #these lines could also be changed instead of above
 		pos.pose.position.y = next_wp.pose.position.y
 		pos.pose.position.z = next_wp.pose.position.z #this line can be changed to reflect desired z setpoints
+		#if 'curr_z' in globals():
+		#	rospy.loginfo('spins:%s,curr_z:%s,offboard_counter:%s',str(spins),str(curr_z),str(offboard_counter))
 		if spins == 0 and 'curr_z' in globals() and curr_z > 0.3 and offboard_counter >= 150:
 			rospy.loginfo("executing first spin maneuver")
 			spin = True
@@ -107,13 +117,13 @@ def wp_pub_sub():
 		if spin:
 			# Yaw is in /slam_out_pose frame.
 			if spin_flag == 1:
-				rospy.loginfo("Yaw Left")
+				#rospy.loginfo("Yaw Left")
 				yaw = 3*pi/4
 			elif spin_flag == 0:
-				rospy.loginfo("Yaw Right")
+				#rospy.loginfo("Yaw Right")
 				yaw = -3*pi/4
 			else:
-				rospy.loginfo("Yaw Back")
+				#rospy.loginfo("Yaw Back")
 				yaw = 0
 			quat = qfe(0,0,yaw+pi/2)#euler angles -- RPY roll pitch yaw --> Q xyzw 
 						#add pi/2 to send to setpoint_position/local
@@ -125,7 +135,7 @@ def wp_pub_sub():
 			while not 'curr_orient' in globals():
 				time.sleep(0.01)
 			curr_yaw = efq([curr_orient.x,curr_orient.y,curr_orient.z,curr_orient.w])[-1]
-			rospy.loginfo('curr: %s, des: %s',str(curr_yaw),str(yaw))
+			rospy.loginfo('curr_yaw: %s, des_yaw: %s',str(curr_yaw),str(yaw))
 			epsilon = 0.1
 			if abs(curr_yaw - yaw) < epsilon:
 				spin_flag += 1
