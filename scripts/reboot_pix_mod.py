@@ -29,7 +29,7 @@ if __name__ == '__main__':
 	pix.write(b'\r\n')
 	pix.write(b'reboot\r\n')
 	time.sleep(3)
-        pix = serial.Serial('/dev/ttyUSB0',57600)
         pix.flush()
+	pix.write(b'\r\n')
 	pix.write(b'tone_alarm MFT225O3L8GL8GL8GL2E-P8L8FL8FL8FMLL2DL2DMNP8\r\n')
 	pix.close()
