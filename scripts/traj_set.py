@@ -136,7 +136,7 @@ def wp_pub_sub():
 					spins += 1
 			rate.sleep()
 			continue # this tells us to skip everything else in the loop and start from the top, (skip next 7 lines)
-		if rtl and not rtl_flag:
+		if 'rtl' in globals() and rtl and not rtl_flag:
 			rtl_flag = 1
 			rtl_pub.publish(True)
 			rtl_wps = Waypoints()
