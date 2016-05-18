@@ -9,7 +9,7 @@ from std_msgs.msg import Bool, Int16
 
 def occ_grid_cb(data):
     global p,ready,first
-    rospy.loginfo("occ_grid_cb() /ready_for_wps: %s",str(ready))
+    rospy.loginfo("map_reduction.py:occ_grid_cb() /ready_for_wps: %s",str(ready))
     if not ready.data:
 	return
     nav_map = OccupancyGrid()
@@ -29,14 +29,14 @@ def occ_grid_cb(data):
     nav_map.info.height = size
     tmp_map = p[int(x)-size/2:int(x)+size/2,int(y)-size/2:int(y)+size/2]
     if first:
-        tmp_map[:,:size/2-1] = 100
+        tmp_map[:,:size/2] = 100
     nav_map.data = tmp_map.flatten()
     nav_map_pub.publish(nav_map)
 
 def set_ready(data):
     global ready
     ready.data = data.data
-    rospy.loginfo("set_ready() /ready_for_wps: %s",str(ready))
+    rospy.loginfo("map_reduction.py:set_ready() /ready_for_wps: %s",str(ready))
 
 def set_rtl(data):
     global rtl

@@ -73,7 +73,7 @@
 	<param name="calibrate_time" type="bool" value="true"/> 
     
 	<!-- Set the port to connect to here -->
-	<param name="port" type="string" value="/dev/ttyACM0"/> 
+	<param name="address" type="string" value="192.168.0.10"/> 
   
 	<param name="intensity" type="bool" value="false"/>
 </node>
@@ -85,7 +85,7 @@
 <!--###launch offboard scripts. These are the things we have written.###-->
 <node pkg="offboard" type="pos_set.py" name="UAV_setpoint"/>
 
-<node pkg="offboard" type="vid_record.py" name="UAV_cam" output="screen"/>
+<node pkg="offboard" type="vid_record.py" name="UAV_cam"/>
 
 <node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
 

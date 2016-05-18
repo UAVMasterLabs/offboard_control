@@ -49,7 +49,7 @@ def setpoints(data):
 			spin = True
 			while spin:
 				time.sleep(1)
-			first_pub.publish(True)
+#			first_pub.publish(True)
 
 def set_curr(data):
 	global curr_x, curr_y, curr_orient
@@ -75,7 +75,7 @@ def get_rtl(data):
 
 def wp_pub_sub():
 	global curr_x,curr_y,curr_orient,next_wp,ready_pub,spin,mode,size,rtl,all_waypoints,first_pub
-	next_wp.pose.position.z = 0.5
+	next_wp.pose.position.z = 0.4
 	all_waypoints = Waypoints()
 	rospy.init_node('UAV_setpoint',anonymous=True)
 	rospy.Subscriber('next_wps',Waypoints,setpoints)
@@ -99,7 +99,7 @@ def wp_pub_sub():
 		if 'mode' in globals() and mode in "OFFBOARD":
 			offboard_counter += 1
 			#rospy.loginfo(str(offboard_counter))
-			if offboard_counter <= 5:
+			if 0 > offboard_counter <= 5:
 				rospy.loginfo("Just entered OFFBOARD mode")
 		pos = PoseStamped()
 		pos.header.stamp = rospy.Time.now()
@@ -108,7 +108,7 @@ def wp_pub_sub():
 		pos.pose.position.z = next_wp.pose.position.z #this line can be changed to reflect desired z setpoints
 		#if 'curr_z' in globals():
 		#	rospy.loginfo('spins:%s,curr_z:%s,offboard_counter:%s',str(spins),str(curr_z),str(offboard_counter))
-		if spins == 0 and 'curr_z' in globals() and curr_z > 0.3 and offboard_counter >= 150:
+		if spins == 0 and 'curr_z' in globals() and curr_z > 0.15 and offboard_counter >= 50:
 			rospy.loginfo("executing first spin maneuver")
 			spin = True
 			first_pub.publish(True)
@@ -117,13 +117,13 @@ def wp_pub_sub():
 		if spin:
 			# Yaw is in /slam_out_pose frame.
 			if spin_flag == 1:
-				#rospy.loginfo("Yaw Left")
-				yaw = 3*pi/4
+				rospy.loginfo("Yaw Left")
+				yaw = pi/8
 			elif spin_flag == 0:
-				#rospy.loginfo("Yaw Right")
-				yaw = -3*pi/4
+				rospy.loginfo("Yaw Right")
+				yaw = -pi/8
 			else:
-				#rospy.loginfo("Yaw Back")
+				rospy.loginfo("Yaw Back")
 				yaw = 0
 			quat = qfe(0,0,yaw+pi/2)#euler angles -- RPY roll pitch yaw --> Q xyzw 
 						#add pi/2 to send to setpoint_position/local
@@ -135,7 +135,7 @@ def wp_pub_sub():
 			while not 'curr_orient' in globals():
 				time.sleep(0.01)
 			curr_yaw = efq([curr_orient.x,curr_orient.y,curr_orient.z,curr_orient.w])[-1]
-			rospy.loginfo('curr_yaw: %s, des_yaw: %s',str(curr_yaw),str(yaw))
+			#rospy.loginfo('curr_yaw: %s, des_yaw: %s',str(curr_yaw),str(yaw))
 			epsilon = 0.1
 			if abs(curr_yaw - yaw) < epsilon:
 				spin_flag += 1

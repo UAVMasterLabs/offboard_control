@@ -34,6 +34,7 @@ def pos_set():
     zdown = 0
     zhover = 0.35
     while not rospy.is_shutdown():
+	rospy.loginfo(str(frame_id))
 	if state_id is 1:  
        		pos = PoseStamped()
        		pos.header.stamp = rospy.Time.now()
@@ -58,42 +59,66 @@ def pos_set():
                	pos.pose.orientation.y = quat[1]
                	pos.pose.orientation.z = quat[2]
                	pub.publish(pos)
-#        '''elif 150 <= frame_id < 300:
-#                pos = PoseStamped()
-#                pos.header.stamp = rospy.Time.now()
-#                pos.pose.position.x=0
-#                pos.pose.position.y=1
-#                pos.pose.position.z=zhover
-#                quat = qfe(0,0,pi/2)
-#                pos.pose.orientation.w = quat[3]
-#                pos.pose.orientation.x = quat[0]
-#                pos.pose.orientation.y = quat[1]
-#                pos.pose.orientation.z = quat[2]
-#                pub.publish(pos)
-#	elif 300 <= frame_id <450:
-#                pos = PoseStamped()
-#                pos.header.stamp = rospy.Time.now()
-#                pos.pose.position.x=0
-#                pos.pose.position.y=0
-#                pos.pose.position.z=zhover
-#                quat = qfe(0,0,pi/2)
-#                pos.pose.orientation.w = quat[3]
-#                pos.pose.orientation.x = quat[0]   
-#                pos.pose.orientation.y = quat[1]
-#                pos.pose.orientation.z = quat[2]
-#		pub.publish(pos)
-#	elif 450 <= frame_id <550:
-#                pos = PoseStamped()
-#                pos.header.stamp = rospy.Time.now()
-#                pos.pose.position.x=0
-#                pos.pose.position.y=0
-#                pos.pose.position.z=zhover
-#                quat = qfe(0,0,pi/2)
-#                pos.pose.orientation.w = quat[3]
-#                pos.pose.orientation.x = quat[0]   
-#                pos.pose.orientation.y = quat[1]
-#                pos.pose.orientation.z = quat[2]
-#                pub.publish(pos)'''
+        elif 150 <= frame_id < 300:
+                pos = PoseStamped()
+                pos.header.stamp = rospy.Time.now()
+                pos.pose.position.x=0
+                pos.pose.position.y=0
+                pos.pose.position.z=zhover
+                quat = qfe(0,0,pi)
+                pos.pose.orientation.w = quat[3]
+                pos.pose.orientation.x = quat[0]
+                pos.pose.orientation.y = quat[1]
+                pos.pose.orientation.z = quat[2]
+                pub.publish(pos)
+	elif 300 <= frame_id <450:
+                pos = PoseStamped()
+                pos.header.stamp = rospy.Time.now()
+                pos.pose.position.x=0
+                pos.pose.position.y=0
+                pos.pose.position.z=zhover
+                quat = qfe(0,0,pi/2)
+                pos.pose.orientation.w = quat[3]
+                pos.pose.orientation.x = quat[0]   
+                pos.pose.orientation.y = quat[1]
+                pos.pose.orientation.z = quat[2]
+		pub.publish(pos)
+	elif 450 <= frame_id <550:
+                pos = PoseStamped()
+                pos.header.stamp = rospy.Time.now()
+                pos.pose.position.x=0
+                pos.pose.position.y=0.5
+                pos.pose.position.z=zhover
+                quat = qfe(0,0,pi/2)
+                pos.pose.orientation.w = quat[3]
+                pos.pose.orientation.x = quat[0]   
+                pos.pose.orientation.y = quat[1]
+                pos.pose.orientation.z = quat[2]
+                pub.publish(pos)
+	elif 550 <= frame_id <650:
+                pos = PoseStamped()
+                pos.header.stamp = rospy.Time.now()
+                pos.pose.position.x=0
+                pos.pose.position.y=1
+                pos.pose.position.z=zhover
+                quat = qfe(0,0,pi/2)
+                pos.pose.orientation.w = quat[3]
+                pos.pose.orientation.x = quat[0]   
+                pos.pose.orientation.y = quat[1]
+                pos.pose.orientation.z = quat[2]
+                pub.publish(pos)
+	elif 650 <= frame_id <750:
+                pos = PoseStamped()
+                pos.header.stamp = rospy.Time.now()
+                pos.pose.position.x=0
+                pos.pose.position.y=0
+                pos.pose.position.z=zhover
+                quat = qfe(0,0,pi/2)
+                pos.pose.orientation.w = quat[3]
+                pos.pose.orientation.x = quat[0]   
+                pos.pose.orientation.y = quat[1]
+                pos.pose.orientation.z = quat[2]
+                pub.publish(pos)
 	else:
 		if extend_state_id is 'FLYING':
 			zdown -= 1		
@@ -121,3 +146,4 @@ if __name__ == '__main__':
 		pos_set()
 	except rospy.ROSInterruptException:
 		pass
+
