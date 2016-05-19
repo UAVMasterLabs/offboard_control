@@ -1,0 +1,110 @@
+<launch>
+
+	<!--###launch mavros node. Actual node is in file ".../offboard/launch.node.launch"###-->
+	<arg name="fcu_url" default="/dev/ttyAMA0:921600" />
+        <arg name="gcs_url" default="udp://:14556@192.168.0.138:14550" />
+        <!--arg name="gcs_url" default="" /-->
+        <arg name="tgt_system" default="1" />
+        <arg name="tgt_component" default="1" />
+        <arg name="log_output" default="screen" />
+
+	<include file="/home/pi/tunnel_ws/src/offboard/launch/node.launch">
+		<arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+		<arg name="config_yaml" value="$(find mavros)/launch/px4_config.yaml" />
+
+		<arg name="fcu_url" value="$(arg fcu_url)" />
+		<arg name="gcs_url" value="$(arg gcs_url)" />
+		<arg name="tgt_system" value="$(arg tgt_system)" />
+		<arg name="tgt_component" value="$(arg tgt_component)" />
+		<arg name="log_output" value="$(arg log_output)" />
+	</include>
+
+  
+<!--###launch SLAM-related nodes. Hector is doing all of the heavy lifting here.###-->
+<node pkg="hector_mapping" type="hector_mapping" name="hector_mapping" output="screen">
+        <param name="use_tf_scan_transformation" value="true"/>
+        <param name="use_tf_pose_start_estimate" value="false"/>
+        <param name="scan_topic" value="scan"/>
+        <param name="pub_map_odom_transform" value="true"/>
+
+        <param name="map_frame" value="map"/>
+        <param name="base_frame" value="base_link"/>
+        <param name="odom_frame" value="base_link"/>
+        <param name="output_timing" value="false"/>
+
+        <!--Map size/start point-->
+        <param name="map_resolution" value="0.05"/>
+        <param name="map_size" value="1024"/>
+        <param name="map_start_x" value="0.5"/>
+        <param name="map_start_y" value="0.5"/>
+        <param name="map_pub_period" value="5.0"/>
+        <param name="laser_min_dist" value="0.02" />
+        <param name="laser_max_dist" value="4.0" />
+        <param name="laser_z_min_value" value="-1"/>
+        <param name="laser_z_max_value" value="1"/>
+
+        <!--Map update parameters-->
+        <param name="update_factor_free" value="0.4"/>
+        <param name="update_factor_occupied" value="0.9"/>
+        <param name="map_update_distance_thresh" value="0.4"/>
+        <param name="map_update_angle_thresh" value="0.06"/>
+        <param name="scan_subscriber_queue_size" value="5"/>
+        <param name="map_multi_res_levels" value="2" />
+
+        <param name="advertise_map_service" value="true"/>
+        <!--<param name="tf_map_scanmatch_transform_frame_name" value="scanmatcher_frame" />-->
+
+</node>
+
+<!--arg name="geotiff_map_file_path" default="/media/tunnel_usb/maps"/-->
+<arg name="geotiff_map_file_path" default="$(find hector_geotiff)/maps"/>
+
+<include file="$(find hector_geotiff)/launch/geotiff_mapper.launch">
+	<arg name="trajectory_source_frame_name" value="scanmatcher_frame"/>
+	<arg name="map_file_path" value="$(arg geotiff_map_file_path)"/>
+</include>
+
+
+
+
+<node name="hokuyo" pkg="hokuyo_node" type="hokuyo_node" respawn="false" output="screen">
+  
+	<!-- Starts up slower, but timestamps will be accurate. --> 
+	<param name="calibrate_time" type="bool" value="true"/> 
+    
+	<!-- Set the port to connect to here -->
+	<param name="port" type="string" value="/dev/ttyACM0"/> 
+  
+	<param name="intensity" type="bool" value="false"/>
+</node>
+  
+
+
+<node pkg="tf" type="static_transform_publisher" name="base_to_laser_broadcaster" args="0 0 0 0 0 0 /base_link /laser 100"/>
+
+<!--###launch offboard scripts. These are the things we have written.###-->
+<!--node pkg="offboard" type="pos_set.py" name="UAV_setpoint"/-->
+
+<!-- Note to future nick and Hans: This next line does not actually record, just streams.-->
+<node pkg="offboard" type="vid_record.sh" name="UAV_cam" output="screen"/>
+
+<node pkg="offboard" type="map_save.py" name="UAV_map_saver"/>
+
+<node pkg="offboard" type="slam_pose_set.py" name="UAV_pose"/>
+
+<!--node pkg="offboard" type="reboot_pix.py" name="UAV_rebooter"/-->
+
+<!--node pkg="offboard" type="talker.py" name="UAV_nav"/-->
+
+<!--node pkg="offboard" type="traj_set.py" name="UAV_path_planner"/-->
+
+<!--node pkg="offboard" type="map_reduction.py" name="UAV_nav_map"/-->
+
+<!--node pkg="offboard" type="grid_sub.py" name="UAV_grid_loc"/-->
+
+<!--###start SENTEL's navigation java engine for path planning###-->
+<!--node pkg="offboard" type="start_nav_engine.sh" name="nav_engine"/-->
+
+<!--node pkg="rosbag" type="record" name="rosbag_record" args="-o /media/tunnel_usb/flight -a"/-->
+
+</launch>

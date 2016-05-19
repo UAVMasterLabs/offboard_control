@@ -32,7 +32,7 @@ def pos_set():
     extend_state_id = "FLYING"
     state_id = 1
     zdown = 0
-    zhover = 0.35
+    zhover = 0.45
     while not rospy.is_shutdown():
 	rospy.loginfo(str(frame_id))
 	if state_id is 1:  
@@ -59,7 +59,35 @@ def pos_set():
                	pos.pose.orientation.y = quat[1]
                	pos.pose.orientation.z = quat[2]
                	pub.publish(pos)
-        elif 150 <= frame_id < 300:
+	else:
+		if extend_state_id is 'FLYING':
+			zdown -= 1		
+       	        pos = PoseStamped()
+       	        pos.header.stamp = rospy.Time.now()
+       	        pos.pose.position.x=0
+       	        pos.pose.position.y=0
+       	        pos.pose.position.z=zdown
+       	        quat = qfe(0,0,pi/2)
+       	        pos.pose.orientation.w = quat[3]
+       	        pos.pose.orientation.x = quat[0]
+       	        pos.pose.orientation.y = quat[1]
+       	        pos.pose.orientation.z = quat[2]
+       	        pub.publish(pos)
+		if extend_state_id is 'LANDED':
+			rospy.set_param('mavsafety','disarm')
+			break
+	if state_id is 2:
+		frame_id += 1
+	rate.sleep()
+
+if __name__ == '__main__':
+	global state_id
+	try:
+		pos_set()
+	except rospy.ROSInterruptException:
+		pass
+
+'''        elif 150 <= frame_id < 300:
                 pos = PoseStamped()
                 pos.header.stamp = rospy.Time.now()
                 pos.pose.position.x=0
@@ -118,32 +146,5 @@ def pos_set():
                 pos.pose.orientation.x = quat[0]   
                 pos.pose.orientation.y = quat[1]
                 pos.pose.orientation.z = quat[2]
-                pub.publish(pos)
-	else:
-		if extend_state_id is 'FLYING':
-			zdown -= 1		
-       	        pos = PoseStamped()
-       	        pos.header.stamp = rospy.Time.now()
-       	        pos.pose.position.x=0
-       	        pos.pose.position.y=0
-       	        pos.pose.position.z=zdown
-       	        quat = qfe(0,0,pi/2)
-       	        pos.pose.orientation.w = quat[3]
-       	        pos.pose.orientation.x = quat[0]
-       	        pos.pose.orientation.y = quat[1]
-       	        pos.pose.orientation.z = quat[2]
-       	        pub.publish(pos)
-		if extend_state_id is 'LANDED':
-			rospy.set_param('mavsafety','disarm')
-			break
-	if state_id is 2:
-		frame_id += 1
-	rate.sleep()
-
-if __name__ == '__main__':
-	global state_id
-	try:
-		pos_set()
-	except rospy.ROSInterruptException:
-		pass
+                pub.publish(pos)'''
 

@@ -2,4 +2,4 @@
 source /opt/ros/indigo/setup.bash
 screen -S tunnel -d -m
 sleep 5
-screen -S tunnel -p 0 -X stuff "export LD_LIBRARY_PATH=/home/pi/tunnel_ws/devel/lib:/opt/ros/indigo/lib && roslaunch offboard offboard_slam.launch$(printf \\r)"
+screen -S tunnel -p 0 -X stuff "export LD_LIBRARY_PATH=/home/pi/tunnel_ws/devel/lib:/opt/ros/indigo/lib && roslaunch offboard offboard_slam_test.launch$(printf \\r)"
