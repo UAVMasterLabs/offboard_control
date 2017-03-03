@@ -58,6 +58,8 @@ def record():
 
 if __name__ == '__main__':
 	try:
+		global Record
+		Record = False
 		filepath = '/home/pi/tunnel_ws/src/hector_slam/hector_geotiff/maps/'
 		cam_thread = Thread(target = record)
 		cam_thread.daemon = True

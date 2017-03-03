@@ -5,8 +5,9 @@ from sensor_msgs.msg import Range
 
 def set_pose(pose):
 	global UAVPose
-	UAVPose.pose.position.x = pose.pose.position.x
-	UAVPose.pose.position.y = pose.pose.position.y
+	UAVPose.pose.position.x = -pose.pose.position.y
+	UAVPose.pose.position.y = -pose.pose.position.x
+	UAVPose.pose.position.z = -pose.pose.position.z
 	UAVPose.pose.orientation.z = pose.pose.orientation.z
 	UAVPose.pose.orientation.w = pose.pose.orientation.w
 # The frame needs to taken into account here. Need to see what frame hector_slam
@@ -17,17 +18,19 @@ def set_pose(pose):
 #	UAVPose.pose.pose.orientation.w = pose.pose.pose.orientation.w
 #	UAVPose.pose.covariance = pose.pose.covariance
 
-def set_alt(range):
-	global UAVPose
-	UAVPose.pose.position.z = range.range
+#def set_alt(range):
+#	global UAVPose
+#	UAVPose.pose.position.z = range.range
 #	UAVPose.pose.pose.position.z = range.range
 	
 def nodes():
+	global UAVPose
+	UAVPose = PoseStamped()
 	rospy.init_node('UAV_pose')
 	rospy.Subscriber('/Test_Quad_1/pose',PoseStamped,set_pose)
 #	rospy.Subscriber('/slam_out_pose',PoseStamped,set_pose)
 #	rospy.Subscriber('/poseupdate',PoseWithCovarianceStamped,set_pose)
-	rospy.Subscriber('/mavros/px4flow/ground_distance',Range,set_alt)
+#	rospy.Subscriber('/mavros/px4flow/ground_distance',Range,set_alt)
 	pub = rospy.Publisher('/mavros/mocap/pose',PoseStamped,queue_size=10)
 #	pub = rospy.Publisher('/mavros/vision_pose/pose',PoseStamped,queue_size=10)
 #	pub = rospy.Publisher('/mavros/vision_pose/pose_cov',PoseWithCovarianceStamped,queue_size=10)

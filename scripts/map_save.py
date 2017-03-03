@@ -29,6 +29,7 @@ def arm_watch():
 
 def record():
 	global Record
+	Record = False
 	geotiff_pub = rospy.Publisher('syscommand',String,queue_size=10)
 	while not rospy.is_shutdown():
 		start = time()
